@@ -9,14 +9,20 @@ orphelines laissées par les fichiers supprimés.
 Ne touche jamais aux conflits de contenu : ceux-là sont des arbitrages humains
 (règle : l'amont gagne, sauf spécificité Phenisys assumée).
 
+Porte EXCLU-MODIFIÉ : un fichier EXCLU que la release amont a MODIFIÉ depuis la
+dernière release fusionnée n'est PAS supprimé à l'aveugle — il est conservé et
+la résolution échoue (code 1) tant qu'il n'a pas été porté puis tracé dans la
+section `[excluded-reviewed]` du manifeste (`<chemin>  # <tag> <date> <décision>`).
+Les chemins PURGÉS restent supprimés sans blocage.
+
 Usage :
   scripts/upstream_merge_resolve.py            # applique le manifeste
   scripts/upstream_merge_resolve.py --check    # rapport seul, aucune mutation
 
 Codes de sortie : 0 = résolution mécanique OK ; 1 = violation d'assertion (un
-chemin interdit subsiste, ou une importation relative pointe vers une cible
-absente du disque) ; 2 = des conflits de contenu subsistent (normal, à arbitrer
-à la main).
+chemin interdit non tracé subsiste, une importation relative pointe vers une
+cible absente, ou un exclu-modifié n'est ni porté ni tracé) ; 2 = des conflits
+de contenu subsistent (normal, à arbitrer à la main).
 """
 from __future__ import annotations
 
@@ -57,13 +63,20 @@ def git(repo, *args, ok=True):
 
 
 def parse_manifest(path):
-    """Retourne (purged, excluded, warn) — listes et motifs."""
-    purged, excluded, warn, section = [], [], [], None
+    """Retourne (purged, excluded, warn, excluded_reviewed) — listes et motifs.
+
+    `excluded_reviewed` : chemins de la section `[excluded-reviewed]`,
+    format `<chemin>  # <tag-amont> <date> <décision>`. On ne garde que le
+    chemin ; le commentaire est la traçabilité demandée par la politique du
+    fork (on a LUS le diff amont avant de confirmer l'exclusion).
+    """
+    purged, excluded, warn, excluded_reviewed = [], [], [], []
+    section = None
     for raw in path.read_text(encoding="utf-8").splitlines():
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
-        m = re.match(r"^\[(\w+)\]", line)
+        m = re.match(r"^\[([\w-]+)\]", line)
         if m:
             section = m.group(1)
             continue
@@ -73,7 +86,9 @@ def parse_manifest(path):
             excluded.append(line)
         elif section == "warn":
             warn.append(line)
-    return purged, excluded, warn
+        elif section == "excluded-reviewed":
+            excluded_reviewed.append(line.split("#", 1)[0].strip().rstrip("+"))
+    return purged, excluded, warn, excluded_reviewed
 
 
 def code_files(repo):
@@ -147,7 +162,7 @@ def main():
     if not manifest.is_file():
         sys.exit("FAILED: manifeste introuvable : %s" % manifest)
 
-    purged, excluded, warn = parse_manifest(manifest)
+    purged, excluded, warn, excluded_reviewed = parse_manifest(manifest)
     if not purged or not excluded:
         sys.exit("FAILED: manifeste vide ou mal formé (purged=%d excluded=%d)"
                  % (len(purged), len(excluded)))
@@ -177,21 +192,83 @@ def main():
               if (Path(repo) / p).is_file() and p not in unmerged]
     print("  exclus arrivés sans conflit                : %d" % len(silent))
 
+    # --- Porte EXCLU-MODIFIÉ (politique du fork) ---
+    # Supprimer un fichier EXCLU à l'aveugle est interdit s'il porte encore du
+    # contenu que la release amont a TOUCHÉ depuis la dernière release fusionnée
+    # (piège fondateur : `SpacesTree.tsx` exclu alors qu'il portait le menu
+    # d'actions note). Les PURGÉS (suppressions de fonctionnalité assumées) ne
+    # sont pas bloqués : on les veut partis, point. L'exclusion ne devient
+    # licite qu'APRÈS lecture du diff amont + traçabilité `[excluded-reviewed]`
+    # (tag-amont date décision). Voir docs/upstream-merge/README.md.
+    upstream_ref = None
+    if merging:
+        out, _, _ = run(["git", "-C", repo, "rev-parse", "--verify", "MERGE_HEAD"])
+        upstream_ref = out.strip() or None
+    if upstream_ref:
+        out, err, rc = run(["git", "-C", repo, "merge-base", "HEAD", upstream_ref])
+        base_ref = out.strip() if rc == 0 else None
+    else:
+        base_ref = None
+
+    def upstream_touched(path):
+        """True si la release amont a modifié/ajouté `path` depuis la base."""
+        if not base_ref:
+            return None
+        out, err, rc = run(["git", "-C", repo, "diff", "--name-only", base_ref, upstream_ref, "--", path])
+        if rc != 0:
+            return None
+        return bool(out.strip())
+
+    protected, unknown = [], []
+    for p in sorted(set(mechanical) | set(silent)):
+        if p not in excluded:
+            continue  # purgé : suppression voulue, non bloquée
+        touched = upstream_touched(p)
+        if touched is None:
+            unknown.append(p)  # base inconnue (merge-base introuvable) : on laisse passer, on signale
+        elif touched and p not in excluded_reviewed:
+            protected.append(p)
+
+    if protected:
+        print("\n-- BLOQUÉ (EXCLU-MODIFIÉ, non tracé) : %d --" % len(protected))
+        for p in protected:
+            print("   ! %s : l'amont l'a modifié depuis %s — NE PAS SUPPRIMER" % (p, (base_ref or "?")[:12]))
+            print("     lire le diff amont (voir le rapport de fork), porter ce qui est portable,")
+            print("     puis tracer l'exclusion :  %s  # %s <date> <décision>"
+                  % (p, (upstream_ref or "?")[:40]))
+        if a.check:
+            print("   (--check : pas de suppression ; en mode normal la fusion serait bloquée)")
+    if unknown:
+        print("\n-- AVERTI : %d exclu(s) sans base de comparaison, suppression non vérifiée --" % len(unknown))
+        for p in unknown:
+            print("   ? %s" % p)
+
     removed, failures = [], []
+    deletable = sorted(set(mechanical) | set(silent))
     if not a.check:
-        for p in sorted(set(mechanical) | set(silent)):
+        for p in deletable:
+            if p in protected:
+                continue  # bloqué : on ne supprime pas un exclu-modifié non tracé
             out, err, rc = run(["git", "-C", repo, "rm", "-f", "-q", "--ignore-unmatch", "--", p])
             if rc != 0:
                 failures.append((p, err.strip()))
             else:
                 removed.append(p)
-        print("\n-- supprimés : %d / %d --" % (len(removed), len(set(mechanical) | set(silent))))
+        print("\n-- supprimés : %d / %d (%d bloqué(s)) --"
+              % (len(removed), len(deletable), len(deletable) - len(removed)))
         for p, e in failures[:10]:
             print("   ! échec %s : %s" % (p, e))
 
     # assertions
     print("\n-- assertions --")
-    present = [p for p in forbidden if (Path(repo) / p).exists()]
+    # Les exclus BLOQUÉS sont volontairement restés dans l'arbre : l'arbitrage
+    # (portage puis exclusion tracée) n'est pas fait. On les sort de la
+    # violation « chemin interdit encore présent » — ce sont des points à
+    # ARBITRER, pas des échecs de résolution — et le code de sortie 1 vient
+    # de la liste `protected`, qui est explicable.
+    present = [p for p in forbidden if (Path(repo) / p).exists() and p not in protected]
+    if protected:
+        print("   %d exclu(s)-modifié(s) conservé(s) volontairement — à arbitrer (voir ci-dessus)" % len(protected))
     if present:
         print("   ECHEC : %d chemin(s) interdit(s) encore présent(s)" % len(present))
         for p in present[:10]:
@@ -229,6 +306,10 @@ def main():
             print("     %s" % p)
 
     print("\n-- suite --")
+    if protected:
+        print("  %d exclu(s)-modifié(s) à arbitrer : lire le diff amont (rapport de fork)," % len(protected))
+        print("  porter ce qui est portable, puis tracer l'exclusion dans [excluded-reviewed].")
+        print("  La fusion reste BLOQUÉE tant qu'ils ne sont ni portés ni tracés.")
     if content:
         print("  %d conflit(s) de contenu à arbitrer :" % len(content))
         for p in content:
@@ -237,7 +318,7 @@ def main():
           "&& npm run typecheck && npm run build:renderer")
     print("  puis : PR pour merge humain")
 
-    if present or failures or dangling:
+    if protected or present or failures or dangling:
         return 1
     if content:
         return 2

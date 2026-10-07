@@ -12,6 +12,16 @@
 # [excluded]  Fichiers de la couche exclue arrivés avec l'amont (donc sans
 #             conflit : ils s'ajouteraient silencieusement). Liste vérifiée
 #             fichier par fichier pour la fenêtre de fusion courante.
+# [excluded-reviewed]
+#             TRACABILITÉ des exclusions décidées APRÈS lecture du diff amont.
+#             Un fichier de [excluded] que la release amont a MODIFIÉ depuis la
+#             dernière fusion n'est PAS supprimé à l'aveugle (porte EXCLU-MODIFIÉ
+#             de scripts/upstream_merge_resolve.py) : il faut l'avoir lu, porté
+#             ce qui était portable, puis l'inscrire ICI pour débloquer la
+#             suppression. Format (commentaire = la traçabilité demandée) :
+#               <chemin>  # <tag-amont> <date> <décision / raison>
+#             Ce chemin reste aussi dans [excluded] ; l'entrée ici ne fait que
+#             certifier que la relecture a eu lieu.
 # [warn]      Motifs d'ALERTE, non destructifs. Le script signale tout fichier
 #             correspondant qui n'est ni dans [purged] ni dans [excluded] :
 #             un nouveau fichier de la couche exclue apparu dans une version
@@ -289,6 +299,10 @@ test/stores/leaderboardParticipationStore.test.js
 #     import d'allowlist pointe désormais sur enterpriseAiProviders.js.
 #   test/helpers/enterpriseEndpointGuard.test.js  test de
 #     src/helpers/enterpriseProviderErrors.js (module conservé).
+[excluded-reviewed]
+# (section vide) — les exclusions tracées s'inscrivent ici au fur et à mesure
+# des fusions, format :  <chemin>  # <tag-amont> <date> <décision>
+# Exemple :  src/components/notes/SpacesTree.tsx  # v1.10.3 2026-11-02 note-actions portées dans LocalNotesTree
 [warn]
 *account*
 *billing*
