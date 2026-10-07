@@ -30,6 +30,56 @@ Le manifeste `exclusions.txt` est la **forme mécanique de la divergence** : c'e
 lui qui évite de rejouer la purge à la main à chaque version. Toute entrée ajoutée
 est une décision d'exclusion — à relire et à versionner comme du code.
 
+## Règle de parité fonctionnelle — l'amont d'abord, nos spécificités ensuite
+
+Ordre imposé, à chaque fusion :
+
+1. **Fusionner l'amont entier** (nouveautés, correctifs, tests).
+2. **Ré-appliquer nos spécificités** sur le résultat : BYOK / local /
+   self-hosted ; on retire la couche compte / cloud / workspace / billing /
+   sync / MS-Calendar / enterprise.
+3. **Passer la porte de parité** :
+   `node scripts/upstream-parity-audit.mjs --tag vX.Y.Z --fetch`.
+
+Deux interdits, parce que les deux pertes constatées viennent de là :
+
+- **Résoudre un conflit « en gardant le nôtre ».** Un fichier commun absorbé
+  d'un bloc perd en silence tout ce que l'amont y avait ajouté. Chaque hunk
+  amont doit être soit porté, soit écarté avec une raison écrite.
+- **Exclure un fichier sans lire ce qu'il porte.** La couche cloud contient des
+  fonctionnalités qui n'ont rien de cloud : `src/components/notes/SpacesTree.tsx`
+  (exclu) portait le **menu d'actions des notes** — supprimer, renommer — donc
+  notre arbre local n'a ni bouton de suppression ni renommage de dossier.
+  La fonctionnalité (et son test) doit être **portée dans notre équivalent
+  local avant** d'inscrire le chemin dans `exclusions.txt`.
+
+### L'audit de parité
+
+```bash
+node scripts/upstream-parity-audit.mjs --tag v1.10.2 --fetch          # + rapport
+node scripts/upstream-parity-audit.mjs --upstream refs/tmp/upstream-v1.10.2
+```
+
+Déterministe, aucun LLM, aucune mutation : il lit deux arbres et écrit
+`docs/upstream-merge/parity-<tag>.md`. Code de sortie **1** = arbitrage requis.
+
+| Contrôle | Ce qu'il attrape | Traitement |
+|---|---|---|
+| 1. Fichiers amont absents | Un fichier officiel ni purgé ni exclu = oubli probable | le porter, ou l'ajouter au manifeste avec une raison |
+| 2. Lignes amont absentes dans les fichiers communs | Ce que l'amont a ajouté dans un fichier que nous avons réécrit | relire la section 2 du rapport, fichier par fichier |
+| 3. Clés d'interface orphelines | Un écran ou une action disparus (la clé n'est plus référencée) | hors couche exclue = à vérifier |
+| 4. Contrat `parity-checks.txt` | Les fonctionnalités nommées qui doivent survivre | `MANQUANT` → porter, ou `waived=<raison>` |
+
+Le contrat `docs/upstream-merge/parity-checks.txt` est la mémoire des pertes
+déjà payées : une aiguille littérale par fonctionnalité, vérifiée des deux
+côtés (`PÉRIMÉ` si l'amont ne contient plus l'aiguille — donc le contrat ne
+protège plus rien). Toute exclusion d'un fichier porteur de fonctionnalité doit
+y ajouter sa ligne.
+
+**Ce que l'audit ne voit pas** : une fonctionnalité dont l'aiguille est un
+identifiant local, et tout ce qui a été perdu *à l'intérieur* d'un fichier
+exclu. La section 2 et la relecture du manifeste restent humaines.
+
 ## Après l'arbitrage
 
 ```bash
@@ -58,6 +108,18 @@ de faux échecs. Il ne retombe jamais sur un autre majeur.
 
 ## Historique des décisions
 
+- **2026-10-07 — parité fonctionnelle rendue mécanique.** Audit
+  `scripts/upstream-parity-audit.mjs` + contrat `parity-checks.txt` écrits après
+  deux pertes constatées en v1.10.2 : le **bouton de suppression de note** et le
+  **renommage de dossier**, tous deux portés par le `SpacesTree.tsx` exclu, et
+  le **menu « Nouvelle note / Nouveau chat »** du panneau, remplacé par un
+  bouton simple. Règle adoptée : l'amont d'abord, nos spécificités ensuite.
+  L'audit de v1.10.2 (audit de référence) signalait alors 40 fichiers amont non
+  classés → 38 classés dans le manifeste, 2 laissés à trancher, plus les
+  fonctionnalités manquantes. La **fin d'enregistrement automatique** a été
+  vérifiée à cette occasion : contrôleur, événement IPC, éligibilité et offre de
+  résumé sont **à parité** (0 ligne d'écart sur les fichiers concernés) — sa
+  perte éventuelle n'est pas un écart de code.
 - **2026-09-11 — stratégie « fusion amont » retenue**, portage commit-par-commit
   abandonné. Mesures : fusion directe de `v1.10.0` dans `main` = **103** conflits
   (37 contenu / 66 modify-delete) ; après merge de la branche de portage v1.9.0 =

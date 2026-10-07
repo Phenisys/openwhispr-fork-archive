@@ -20,6 +20,17 @@
 #
 # Ajouter un chemin ici = décider d'exclure de la couche officielle. À traiter
 # comme du code : relu, versionné, et cité dans le PV de la fusion.
+#
+# ⚠️ AVANT D'EXCLURE UN FICHIER, VÉRIFIER CE QU'IL PORTE. Un fichier de la
+# couche cloud contient souvent des fonctionnalités qui n'ont rien de cloud :
+# `src/components/notes/SpacesTree.tsx` portait le menu d'actions des notes
+# (supprimer, renommer) ; l'avoir exclu a fait disparaître le bouton de
+# suppression de nos notes locales. Dans ce cas : PORTER la fonctionnalité (et
+# son test) dans notre équivalent local AVANT d'ajouter le chemin ici, et
+# l'inscrire au contrat `parity-checks.txt` pour qu'elle ne reparte pas.
+# L'audit `scripts/upstream-parity-audit.mjs` refuse un fichier amont non
+# classé, mais il ne peut pas voir ce qui a été perdu À L'INTÉRIEUR d'un
+# fichier exclu : cette relecture reste humaine.
 [purged]  # 117 chemins
 src/components/AcceptInvitationModal.tsx
 src/components/ApiKeysSection.tsx
@@ -216,6 +227,54 @@ src/hooks/useMemberRoster.ts
 test/components/newNoteMenu.test.js
 test/hooks/canCreateTeamSpace.test.js
 test/services/spacesService.test.js
+
+# Classement de l'audit de parité (2026-10-07) — familles présentes dans
+# l'amont v1.10.2, absentes de notre arbre, et relevant SANS AMBIGUÏTÉ de la
+# couche exclue (leaderboard social, Insights/télémétrie, analytics,
+# en-têtes de session vers auth.openwhispr.com, onboarding de compte).
+# Sans ce classement, l'audit les signalait comme oublis potentiels.
+# Restent volontairement NON classés, donc en échec d'audit tant qu'ils ne sont
+# pas tranchés : test/components/spacesTreeNoteActionClearance.test.js (garde-fou
+# du menu d'actions des notes — à porter avec le bouton de suppression) et
+# test/helpers/settingsStoreRetiredGroqModels.test.js (migration du registre).
+src/components/InsightsView.tsx
+src/components/JoinYourTeamModal.tsx
+src/components/LeaderboardEmptyStrip.tsx
+src/components/LeaderboardJoinPreview.tsx
+src/components/LeaderboardPodium.tsx
+src/components/LeaderboardPreview.tsx
+src/components/LeaderboardRequestJoinPreview.tsx
+src/components/LeaderboardSection.tsx
+src/components/LeaderboardSetupCard.tsx
+src/components/LeaderboardShareDialog.tsx
+src/components/LeaderboardSoloEmptyState.tsx
+src/components/LeaderboardView.tsx
+src/helpers/insightsConsentCoordinator.ts
+src/helpers/leaderboard.ts
+src/helpers/leaderboardImage.js
+src/helpers/sessionHeaders.js
+src/hooks/useLeaderboardParticipation.ts
+src/lib/pendingLeaderboardLeave.ts
+src/services/AnalyticsService.ts
+src/services/LeaderboardService.ts
+src/stores/leaderboardParticipationStore.ts
+test/components/leaderboardNavigation.test.js
+test/components/leaderboardStaleBoard.test.js
+test/components/leaderboardStates.test.js
+test/helpers/analyticsBackfillContract.test.js
+test/helpers/insightsConsentCoordinator.test.js
+test/helpers/leaderboard.test.js
+test/helpers/leaderboardImage.test.js
+test/helpers/syncAnalyticsFlushDetach.test.js
+test/hooks/leaderboardParticipation.test.js
+test/hooks/useStartOnboarding.test.js
+test/lib/pendingLeaderboardLeave.test.js
+test/locales/analyticsClearCopy.test.js
+test/services/analyticsClaimContract.test.js
+test/services/analyticsParticipationGate.test.js
+test/services/analyticsService.test.js
+test/services/leaderboardService.test.js
+test/stores/leaderboardParticipationStore.test.js
 
 # Restaurations du 2026-09-12 (fusion v1.10.0, nettoyage du câblage) — ces
 # chemins ont été retirés de [excluded] parce que le fork CONSERVE la

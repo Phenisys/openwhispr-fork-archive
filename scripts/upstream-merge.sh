@@ -12,7 +12,11 @@
 #      chemins purgés maintenus supprimés + fichiers exclus arrivés sans conflit,
 #      puis assertions et rapport des références orphelines ;
 #   4. laisse les conflits de contenu à l'arbitrage humain (règle : l'amont
-#      gagne, sauf spécificité Phenisys assumée) et affiche la marche à suivre.
+#      gagne, sauf spécificité Phenisys assumée) et affiche la marche à suivre ;
+#   5. passe la porte de PARITÉ FONCTIONNELLE (scripts/upstream-parity-audit.mjs) :
+#      toute fonctionnalité officielle encore absente est listée, et le script
+#      sort en code 1 tant qu'elle n'est pas portée ou explicitement écartée
+#      (`waived=` dans docs/upstream-merge/parity-checks.txt).
 #
 # Usage :
 #   scripts/upstream-merge.sh v1.10.0
@@ -163,6 +167,19 @@ case "$RESOLVE_RC" in
   *) echo "ERREUR : résolution mécanique incomplète (code $RESOLVE_RC)." >&2 ;;
 esac
 
+echo
+echo "-- parité fonctionnelle (l'amont d'abord, nos spécificités ensuite) --"
+set +e
+node scripts/upstream-parity-audit.mjs --tag "$TAG" --upstream "refs/tags/$LOCAL_REF"
+PARITY_RC=$?
+set -e
+if [ "$PARITY_RC" = "0" ]; then
+  echo "Parité fonctionnelle vérifiée."
+else
+  echo "Parité fonctionnelle INCOMPLÈTE : la fusion n'est pas terminée tant que les points" \
+       "ci-dessus ne sont pas portés ou tranchés (waived= dans docs/upstream-merge/parity-checks.txt)."
+fi
+
 if [ "$VERIFY" = "1" ]; then
   echo
   echo "-- vérifications (Node ${WANT_NODE} ; choisi : ${NODE_BIN:-PATH}) --"
@@ -182,4 +199,7 @@ if [ "$VERIFY" = "1" ]; then
   run_with_node npm run build:renderer
 fi
 
-exit "$RESOLVE_RC"
+if [ "$RESOLVE_RC" != "0" ]; then
+  exit "$RESOLVE_RC"
+fi
+exit "$PARITY_RC"
