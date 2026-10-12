@@ -427,6 +427,7 @@ export default function LocalNotesTree({
         {creatingFolder && (
           <div className="pr-2 pl-4">
             <input
+              dir="auto"
               autoFocus
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}

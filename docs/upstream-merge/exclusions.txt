@@ -226,8 +226,10 @@ test/utils/managedAzureTranscriptionUrl.test.js
 # des fichiers exclus (SpaceSettingsDialog / SpaceMembersPanel).
 # useCanCreateTeamSpace / SpacesService+InvitationsService purgés).
 # NewNoteMenu et son test ont été portés le 2026-10-08 (menu split Note +
-# Chat assistant ; l'option team-space amont reste exclue — voir
-# [excluded-reviewed]) : ils ne sont donc plus listés ici.
+# Chat assistant) : ils ne sont donc plus listés ici. L'option team-space du
+# composant amont n'est PAS portée — elle dépend de useCanCreateTeamSpace /
+# CreateSpaceDialog, purgés avec la couche compte (décision tracée en
+# [excluded-reviewed] : c'est une option du fichier, pas le fichier).
 src/components/MemberRoster.tsx
 src/components/notes/SpaceGroupsSection.tsx
 src/components/notes/SpaceMembersPanel.tsx

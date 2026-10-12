@@ -78,7 +78,7 @@ const EXPECTED_NATIVE_FIELD_DIRECTIONS = {
   "src/components/chat/ChatInput.tsx": ["auto"],
   "src/components/notes/ActionManagerDialog.tsx": ["auto"],
   "src/components/notes/AddNotesToFolderDialog.tsx": ["auto"],
-  "src/components/notes/LocalNotesTree.tsx": ["inherit"],
+  "src/components/notes/LocalNotesTree.tsx": ["auto", "auto"],
   "src/components/notes/MeetingTranscriptChat.tsx": ["ltr", "auto"],
   "src/components/notes/NoteBottomBar.tsx": ["auto"],
   "src/components/notes/NoteEditor.tsx": ["auto", "auto"],
