@@ -88,15 +88,18 @@ function loadManifest(root) {
   for (const raw of readFileSync(file, "utf8").split("\n")) {
     const line = raw.trim();
     if (!line) continue;
-    const header = line.match(/^\[(purged|excluded|warn)\]/);
+    const header = line.match(/^\[(purged|excluded|excluded-reviewed|warn)\]/);
     if (header) {
       section = header[1];
       sections[section] = sections[section] || [];
       continue;
     }
     if (line.startsWith("#")) continue;
-    sections[section] = sections[section] || [];
-    sections[section].push(line.replace(/\/+$/, ""));
+    // Une ligne de section peut porter une annotation « # … » (section
+    // [excluded-reviewed] : <chemin>  # <tag> <date> <décision>) ; seul le
+    // chemin compte pour le matching, l'annotation est tracabilité pure.
+    const path = line.split("#")[0].trim().replace(/\/+$/, "");
+    if (path) sections[section].push(path);
   }
   // [purged] et [excluded] sont des exclusions DÉCIDÉES ; [warn] n'est qu'une alerte.
   const excluded = [...(sections.purged || []), ...(sections.excluded || [])];

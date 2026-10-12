@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 import { Button } from "./ui/button";
 import { BIDI_VALUE_TOKEN, BidiInterpolatedText } from "./ui/BidiInterpolatedText";
-import { Download, RefreshCw, Loader2, AlertTriangle, Zap, Plus } from "./icons";
+import { Download, RefreshCw, Loader2, AlertTriangle, Zap } from "./icons";
+import NewNoteMenu from "./notes/NewNoteMenu";
 import { RequiredModelsBanner } from "./RequiredModelsBanner";
 import { ConfirmDialog, AlertDialog } from "./ui/dialog";
 import { useDialogs } from "../hooks/useDialogs";
@@ -143,7 +144,9 @@ export default function ControlPanel({ initialSettingsSection }: ControlPanelPro
   const agentAllowedByPolicy = usePolicyStore(isAgentAllowed);
   const { createNote } = useCreateNote();
   // The note is created before the view switches so Notes mounts with it already open.
-  // (Phenisys: plain button — the upstream NewNoteMenu team-space dropdown was purged.)
+  // (Phenisys: the upstream NewNoteMenu was purged with the account layer; it is
+  // ported back on 2026-10-08 without the team-space option — see
+  // docs/upstream-merge/exclusions.txt [excluded-reviewed].)
   const handleNewNote = useCallback(async () => {
     await createNote();
     setActiveView("personal-notes");
@@ -851,15 +854,10 @@ export default function ControlPanel({ initialSettingsSection }: ControlPanelPro
               isSidePanelLayout={isSidePanelLayout}
               onExitSidePanel={handleExitSidePanel}
               actions={
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={handleNewNote}
-                  title={t("notes.list.newNote")}
-                >
-                  <Plus size={14} />
-                  {t("notes.list.newNote")}
-                </Button>
+                <NewNoteMenu
+                  onNewNote={handleNewNote}
+                  onNewChat={agentAllowedByPolicy ? () => setActiveView("chat") : undefined}
+                />
               }
             />
             <div className="scrollbar-hidden flex-1 overflow-y-auto">
