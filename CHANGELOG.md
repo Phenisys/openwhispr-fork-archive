@@ -7,15 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.4] - 2026-10-12
+
+### Corrections
+
+- **Arbre de notes : bouton ⋯ qui se décalait au survol** (suppression/renommage difficiles à atteindre, régression de la 1.10.3). `LocalNotesTree.tsx` (réécriture locale) est remplacé par le `SpacesTree.tsx` amont v1.10.2 repris tel quel ; la couche compte/équipe est branchée à ses frontières via `src/components/notes/localMode.ts`. (#28)
+
+### Infrastructure
+
+- Principe de fusion documenté (`docs/upstream-merge/README.md`) : reprendre l'amont à l'identique, ne coder que nos spécificités. Test amont `spacesTreeNoteActionClearance` porté. (#28)
+
 ## [1.10.3] - 2026-10-12
 
 Version du fork Phenisys : mise à parité fonctionnelle avec l'amont officiel v1.10.2 (règle : intégrer d'abord tout l'amont, puis nos spécificités BYOK / local / self-hosted).
 
 ### Fonctionnalités (portées de l'amont v1.10.2)
 
-- **Nouvelle note : bouton split dans la barre du panneau.** `+ Nouvelle note` crée une note dans l'espace/dossier courant ; sa chevron ajoute **Chat assistant** (et l'option *team space* amont, retirée ici avec la couche compte). (#24)
+- **Nouvelle note : bouton split dans la barre du panneau.** `+ Nouvelle note` crée une note dans l'espace/dossier courant ; sa chevron ajoute **Chat assistant** (et l'option _team space_ amont, retirée ici avec la couche compte). (#24)
 - **Dossiers locaux : renommer et supprimer.** Entrée de renommage inline sur les dossiers de l'arbo et suppression confirmée (dialogue + toast d'erreur local), avec la même politique de menu que l'amont. (#24)
-- **Actions sur les notes locales.** Kebab note (dossier local) : *Afficher dans le gestionnaire de fichiers* et *Supprimer* (même flux IPC que l'amont). (#24)
+- **Actions sur les notes locales.** Kebab note (dossier local) : _Afficher dans le gestionnaire de fichiers_ et _Supprimer_ (même flux IPC que l'amont). (#24)
 
 ### Infrastructure / CI
 
