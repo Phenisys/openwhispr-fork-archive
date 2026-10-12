@@ -103,8 +103,7 @@ export default function LocalNotesTree({
 
   const showConfirmDialog = (options: Omit<typeof confirmDialog, "open">) =>
     setConfirmDialog({ ...options, open: true });
-  const hideConfirmDialog = () =>
-    setConfirmDialog({ open: false, title: "", onConfirm: () => {} });
+  const hideConfirmDialog = () => setConfirmDialog({ open: false, title: "", onConfirm: () => {} });
 
   const spaces = useSpaces();
   const folders = useFolders();
@@ -414,9 +413,7 @@ export default function LocalNotesTree({
                     )}
                   </div>
                   {active && (
-                    <div className="space-y-px">
-                      {(folderNotes ?? []).map(renderNote)}
-                    </div>
+                    <div className="space-y-px">{(folderNotes ?? []).map(renderNote)}</div>
                   )}
                 </>
               )}
@@ -445,11 +442,7 @@ export default function LocalNotesTree({
           </div>
         )}
 
-        {rootNotes.length > 0 && (
-          <div className="space-y-px">
-            {rootNotes.map(renderNote)}
-          </div>
-        )}
+        {rootNotes.length > 0 && <div className="space-y-px">{rootNotes.map(renderNote)}</div>}
       </div>
 
       {onShowStructureIntro && (
