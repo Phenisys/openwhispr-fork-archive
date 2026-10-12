@@ -687,6 +687,7 @@ export default function PersonalNotesView({
           <LocalNotesTree
             onNewNote={createNoteIn}
             onShowStructureIntro={() => setShowStructureIntro(true)}
+            onDeleteNote={handleDelete}
           />
         </div>
       </div>

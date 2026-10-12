@@ -1,0 +1,49 @@
+# Contrat de parité fonctionnelle — Phenisys/openwhispr
+#
+# Rôle : la liste des FONCTIONNALITÉS de la version officielle qui doivent
+# exister dans notre arbre, même si leur écran d'origine vit dans un fichier
+# que nous avons exclu (cloud / compte / workspace). L'audit
+# `scripts/upstream-parity-audit.mjs` vérifie chacune d'elles après une fusion.
+#
+# Format : <id> | <aiguille littérale> | <globs> | [waived=<raison>]
+#   - l'aiguille est une chaîne présente dans le CODE OFFICIEL (l'audit le
+#     vérifie : une aiguille absente de l'amont rend la sonde PÉRIMÉE) ;
+#   - elle doit apparaître chez nous dans au moins un fichier des globs ;
+#   - `waived=` documente une absence ASSUMÉE (et la suite : issue, décision).
+#
+# Ajouter une ligne = promettre que la fonctionnalité reste. La supprimer =
+# décider qu'elle n'est plus attendue. Les deux se relisent en revue.
+#
+# Ce que l'audit ne peut PAS voir : une fonctionnalité dont l'aiguille est un
+# nom de variable local. En cas de doute, choisir un identifiant exporté, une
+# clé d'événement IPC, ou le nom du composant.
+
+# ─── Notes : actions sur une note depuis l'arborescence ────────────────────────
+# Le bouton « supprimer » vivait dans SpacesTree.tsx (exclu comme couche cloud).
+# La suppression doit rester accessible dans notre arbre local.
+notes-note-delete-action | onDeleteNote | src/components/notes/*.tsx
+notes-note-delete-ipc | db-delete-note | src/helpers/*.js
+
+# ─── Notes : fin de l'enregistrement automatique ───────────────────────────────
+# La fin auto d'une réunion (micro libéré, silence, fin du process de réunion)
+# et l'écran qui l'accompagne (résumé proposé, toast « arrêt automatique »).
+notes-meeting-autoend-controller | meetingAutoEndController | src/helpers/*.js
+notes-meeting-autoend-event | onMeetingAutoEndRequested | preload.js,src/components/*.tsx
+notes-meeting-autoend-eligibility | isMeetingAutoEndEligible | src/**/*.ts,src/**/*.tsx
+notes-meeting-summary-after-autoend | shouldOfferMeetingSummary | src/components/notes/*.ts,src/components/notes/*.tsx
+
+# ─── Réunions : détection et capture ──────────────────────────────────────────
+meeting-detection-engine | meetingDetectionEngine | src/helpers/*.js
+meeting-recording-pill | MeetingRecordingPill | src/components/*.tsx,src/components/notes/*.tsx
+meeting-system-audio-watchdog | meetingSystemAudioWatchdog | src/helpers/*.js
+
+# ─── Panneau de contrôle : création de note / de chat ─────────────────────────
+control-panel-new-note-menu | NewNoteMenu | src/components/*.tsx,src/components/notes/*.tsx
+control-panel-start-recording-for-note | startRecordingForNote | src/hooks/*.ts,src/components/**/*.tsx
+
+# ─── Notes : structure locale, dossiers ───────────────────────────────────────
+# L'arbre de notes amont (SpacesTree, exclu) portait aussi les actions de
+# dossier. Notre arbre local doit offrir les mêmes gestes.
+notes-folder-rename | startRenameFolder | src/components/notes/*.tsx
+notes-folder-dialog | AddNotesToFolderDialog | src/components/notes/*.tsx
+notes-editor-record-control | NoteRecordControl | src/components/notes/*.tsx

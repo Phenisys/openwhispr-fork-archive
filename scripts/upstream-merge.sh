@@ -8,11 +8,22 @@
 # Ce que le script fait :
 #   1. vérifie l'arbre propre, récupère le tag officiel (sans remote permanent) ;
 #   2. `git merge --no-ff` du tag ;
-#   3. applique le manifeste d'exclusion (scripts/upstream_merge_resolve.py) :
-#      chemins purgés maintenus supprimés + fichiers exclus arrivés sans conflit,
-#      puis assertions et rapport des références orphelines ;
-#   4. laisse les conflits de contenu à l'arbitrage humain (règle : l'amont
-#      gagne, sauf spécificité Phenisys assumée) et affiche la marche à suivre.
+#   3. génère le RAPPORT DE FORK (scripts/fork-diff-report.mjs) : table de
+#      verdict 10 min (collisions source, collisions mécaniques agrégées,
+#      fichiers du manifeste modifiés par l'amont) + dump exhaustif, écrit dans
+#      docs/upstream-merge/fork-diff-<tag>.md. Déterministe, ne lit que des
+#      diffs : c'est le document de travail de l'arbitrage humain ;
+#   4. applique le manifeste d'exclusion (scripts/upstream_merge_resolve.py) :
+#      chemins purgés maintenus supprimés + fichiers exclus arrivés sans
+#      conflit, PORT BLOQUANT EXCLU-MODIFIÉ (un exclu que l'amont a modifié est
+#      conservé et la résolution échoue tant qu'il n'est pas tracé en
+#      [excluded-reviewed]), puis assertions et références orphelines ;
+#   5. laisse les conflits de contenu à l'arbitrage humain (règle : l'amont
+#      gagne, sauf spécificité Phenisys assumée) et affiche la marche à suivre ;
+#   6. passe la porte de PARITÉ FONCTIONNELLE (scripts/upstream-parity-audit.mjs) :
+#      toute fonctionnalité officielle encore absente est listée, et le script
+#      sort en code 1 tant qu'elle n'est pas portée ou explicitement écartée
+#      (`waived=` dans docs/upstream-merge/parity-checks.txt).
 #
 # Usage :
 #   scripts/upstream-merge.sh v1.10.0
@@ -127,6 +138,13 @@ echo "  merge-base   : $(git merge-base HEAD "refs/tags/$LOCAL_REF" | cut -c1-12
 if [ "$CHECK" = "1" ]; then
   echo
   echo "-- simulation : la fusion ne sera pas effectuée --"
+  echo "-- aperçu du diff de fork (lecture seule, MERGE_HEAD absent) --"
+  # En --check on écrit dans /tmp : la simulation ne doit PAS salir l'arbre
+  # (sinon la vraie fusion échouerait au check d'arbre propre).
+  run_with_node node scripts/fork-diff-report.mjs \
+    --upstream "refs/tags/$LOCAL_REF" \
+    --report "/tmp/fork-diff-${TAG}.md" --quiet || rc=$?
+  echo "  aperçu écrit dans /tmp/fork-diff-${TAG}.md"
   python3 scripts/upstream_merge_resolve.py --manifest "$MANIFEST" --check || rc=$?
   exit "${rc:-0}"
 fi
@@ -147,6 +165,16 @@ else
   exit "$MERGE_RC"
 fi
 
+echo
+echo "-- rapport de fork (arbitrage 10 min : collisions + exclus-modifiés) --"
+# Déterministe, ne lit que des diffs (0 LLM) : classe chaque hunk de nos
+# customisations face au delta amont, et liste les fichiers du manifeste que
+# la release a modifiés. C'est LE document de travail de l'arbitrage humain.
+REPORT_FILE="docs/upstream-merge/fork-diff-${TAG}.md"
+run_with_node node scripts/fork-diff-report.mjs --upstream MERGE_HEAD --report "$REPORT_FILE"
+FORKRC=$?
+echo "  rapport : $REPORT_FILE ($FORKRC: 0=propre, 1=à arbitrer)"
+
 set +e
 python3 scripts/upstream_merge_resolve.py --manifest "$MANIFEST"
 RESOLVE_RC=$?
@@ -162,6 +190,19 @@ case "$RESOLVE_RC" in
           "une cible absente (nettoyage du câblage à faire avant de committer)." >&2 ;;
   *) echo "ERREUR : résolution mécanique incomplète (code $RESOLVE_RC)." >&2 ;;
 esac
+
+echo
+echo "-- parité fonctionnelle (l'amont d'abord, nos spécificités ensuite) --"
+set +e
+node scripts/upstream-parity-audit.mjs --tag "$TAG" --upstream "refs/tags/$LOCAL_REF"
+PARITY_RC=$?
+set -e
+if [ "$PARITY_RC" = "0" ]; then
+  echo "Parité fonctionnelle vérifiée."
+else
+  echo "Parité fonctionnelle INCOMPLÈTE : la fusion n'est pas terminée tant que les points" \
+       "ci-dessus ne sont pas portés ou tranchés (waived= dans docs/upstream-merge/parity-checks.txt)."
+fi
 
 if [ "$VERIFY" = "1" ]; then
   echo
@@ -182,4 +223,7 @@ if [ "$VERIFY" = "1" ]; then
   run_with_node npm run build:renderer
 fi
 
-exit "$RESOLVE_RC"
+if [ "$RESOLVE_RC" != "0" ]; then
+  exit "$RESOLVE_RC"
+fi
+exit "$PARITY_RC"
