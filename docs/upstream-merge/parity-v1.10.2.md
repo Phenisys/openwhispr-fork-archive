@@ -12,7 +12,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 |---|---|---|
 | 221 | 221 | **0** |
 
-<details><summary>Fichiers de notre arbre absents de l'amont (25)</summary>
+<details><summary>Fichiers de notre arbre absents de l'amont (26)</summary>
 
 - `.github/ISSUE_TEMPLATE/feature_request.yml`
 - `.github/pull_request_template.md`
@@ -24,6 +24,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 - `docs/upstream-merge/arbitrage-v1.10.2.md`
 - `docs/upstream-merge/exclusions.txt`
 - `docs/upstream-merge/parity-checks.txt`
+- `docs/upstream-merge/parity-upstream-v1.10.2.md`
 - `docs/upstream-merge/parity-v1.10.2.md`
 - `electron-builder.unsigned.json`
 - `resources/update-feed.json`
