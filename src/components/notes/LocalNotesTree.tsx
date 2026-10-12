@@ -55,7 +55,7 @@ const KEBAB_BUTTON_CLASS =
   "h-5 w-5 rounded-sm [&_svg]:size-3! opacity-0 group-hover:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100 " +
   "transition-opacity text-muted-foreground/70 dark:text-muted-foreground/70 " +
   "hover:text-foreground/60 hover:bg-foreground/5 active:bg-foreground/8";
-const KEBAB_TRIGGER_CLASS = cn(KEBAB_BUTTON_CLASS, "absolute end-1.5");
+const KEBAB_TRIGGER_CLASS = cn(KEBAB_BUTTON_CLASS, "absolute inset-y-0 end-1.5 my-auto");
 const KEBAB_HEAD_BUTTON_CLASS = cn(
   KEBAB_BUTTON_CLASS,
   "shrink-0 rounded-md opacity-100 group-hover:opacity-100"
