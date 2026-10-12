@@ -10,7 +10,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 
 | Total | Exclus par le manifeste | **Non classés (à tranche)** |
 |---|---|---|
-| 222 | 222 | **0** |
+| 221 | 221 | **0** |
 
 <details><summary>Fichiers de notre arbre absents de l'amont (25)</summary>
 
@@ -44,7 +44,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 
 ## 2. Fichiers communs où l'amont a des lignes que nous n'avons pas
 
-Fichiers communs divergents : **118**, dont **101** contiennent des lignes amont absentes chez nous.
+Fichiers communs divergents : **119**, dont **102** contiennent des lignes amont absentes chez nous.
 La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche exclue : ce sont les candidates à la perte silencieuse de fonctionnalité.
 
 | Lignes amont absentes (non-cloud) | Lignes amont absentes (total) | Fichier |
