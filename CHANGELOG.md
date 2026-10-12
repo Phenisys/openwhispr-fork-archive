@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.4] - 2026-10-12
+
+### Corrections
+
+- **Arbre de notes : bouton ⋯ qui se décalait au survol** (suppression/renommage difficiles à atteindre, régression de la 1.10.3). `LocalNotesTree.tsx` (réécriture locale) est remplacé par le `SpacesTree.tsx` amont v1.10.2 repris tel quel ; la couche compte/équipe est branchée à ses frontières via `src/components/notes/localMode.ts`. (#28)
+
+### Infrastructure
+
+- Principe de fusion documenté (`docs/upstream-merge/README.md`) : reprendre l'amont à l'identique, ne coder que nos spécificités. Test amont `spacesTreeNoteActionClearance` porté. (#28)
+
 ## [1.10.3] - 2026-10-12
 
 Version du fork Phenisys : mise à parité fonctionnelle avec l'amont officiel v1.10.2 (règle : intégrer d'abord tout l'amont, puis nos spécificités BYOK / local / self-hosted).
