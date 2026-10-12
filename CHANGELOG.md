@@ -23,9 +23,9 @@ Version du fork Phenisys : mise à parité fonctionnelle avec l'amont officiel v
 
 ### Fonctionnalités (portées de l'amont v1.10.2)
 
-- **Nouvelle note : bouton split dans la barre du panneau.** `+ Nouvelle note` crée une note dans l'espace/dossier courant ; sa chevron ajoute **Chat assistant** (et l'option *team space* amont, retirée ici avec la couche compte). (#24)
+- **Nouvelle note : bouton split dans la barre du panneau.** `+ Nouvelle note` crée une note dans l'espace/dossier courant ; sa chevron ajoute **Chat assistant** (et l'option _team space_ amont, retirée ici avec la couche compte). (#24)
 - **Dossiers locaux : renommer et supprimer.** Entrée de renommage inline sur les dossiers de l'arbo et suppression confirmée (dialogue + toast d'erreur local), avec la même politique de menu que l'amont. (#24)
-- **Actions sur les notes locales.** Kebab note (dossier local) : *Afficher dans le gestionnaire de fichiers* et *Supprimer* (même flux IPC que l'amont). (#24)
+- **Actions sur les notes locales.** Kebab note (dossier local) : _Afficher dans le gestionnaire de fichiers_ et _Supprimer_ (même flux IPC que l'amont). (#24)
 
 ### Infrastructure / CI
 
