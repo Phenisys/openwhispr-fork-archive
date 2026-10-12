@@ -1,6 +1,6 @@
-# Parité fonctionnelle avec l'amont upstream-v1.10.2
+# Parité fonctionnelle avec l'amont v1.10.2
 
-Comparaison : `HEAD` (notre arbre) ← `refs/tags/upstream-v1.10.2` (OpenWhispr officiel).
+Comparaison : `HEAD` (notre arbre) ← `refs/tmp/upstream-v1.10.2` (OpenWhispr officiel).
 
 Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos spécificités** (BYOK / local / self-hosted). Un chemin exclu par `docs/upstream-merge/exclusions.txt` ne justifie pas de perdre une fonctionnalité non-cloud qu'il portait.
 
@@ -10,7 +10,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 
 | Total | Exclus par le manifeste | **Non classés (à tranche)** |
 |---|---|---|
-| 221 | 221 | **0** |
+| 219 | 219 | **0** |
 
 <details><summary>Fichiers de notre arbre absents de l'amont (25)</summary>
 
@@ -31,7 +31,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 - `scripts/upstream-merge.sh`
 - `scripts/upstream-parity-audit.mjs`
 - `scripts/upstream_merge_resolve.py`
-- `src/components/notes/LocalNotesTree.tsx`
+- `src/components/notes/localMode.ts`
 - `test/config/electronBuilderUpdateFeed.test.js`
 - `test/config/inferenceAdvancedParams.test.js`
 - `test/config/inferenceTimeouts.test.js`
@@ -44,7 +44,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 
 ## 2. Fichiers communs où l'amont a des lignes que nous n'avons pas
 
-Fichiers communs divergents : **120**, dont **102** contiennent des lignes amont absentes chez nous.
+Fichiers communs divergents : **122**, dont **104** contiennent des lignes amont absentes chez nous.
 La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche exclue : ce sont les candidates à la perte silencieuse de fonctionnalité.
 
 | Lignes amont absentes (non-cloud) | Lignes amont absentes (total) | Fichier |
@@ -71,15 +71,15 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 | 61 | 65 | `src/services/ai/inferenceProviders/gemini.ts` |
 | 57 | 76 | `test/helpers/audioManagerCancelLifecycle.test.js` |
 | 56 | 103 | `src/stores/noteStore.ts` |
+| 49 | 49 | `package-lock.json` |
 | 45 | 56 | `test/helpers/meetingTranscriptionRouting.test.js` |
 | 43 | 74 | `src/AppRouter.jsx` |
 | 43 | 62 | `test/helpers/dictationTranslationInference.test.js` |
-| 43 | 43 | `package-lock.json` |
 | 36 | 62 | `test/components/directionalContentPolicy.test.js` |
 | 36 | 41 | `test/helpers/useChatStreamingCancellation.test.js` |
 | 34 | 38 | `src/models/modelRegistryData.json` |
 | 32 | 70 | `src/helpers/transcriptionRoute.ts` |
-| 26 | 68 | `src/components/notes/PersonalNotesView.tsx` |
+| 23 | 63 | `src/components/notes/PersonalNotesView.tsx` |
 | 21 | 50 | `src/services/tools/searchNotesTool.ts` |
 | 21 | 42 | `src/components/SettingsModal.tsx` |
 | 21 | 23 | `test/helpers/harness/browserGlobals.js` |
@@ -554,9 +554,6 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 + setActiveNoteId(null);
 + selfName: user?.name?.trim() || null,
 + selfEmail: user?.email?.trim() || null,
-+ onDeleteNote={handleDelete}
-+ onMoveNote={handleMoveNote}
-+ onCreateFolderAndMove={handleCreateFolderAndMove}
 ```
 
 ### `src/services/tools/searchNotesTool.ts`
@@ -712,14 +709,14 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 
 ## 3. Clés d'interface utilisées par l'amont et plus nulle part chez nous
 
-814 clés. Les namespaces de la couche exclue (auth, workspaces, insights, referral, apiKeysSection, forgotPassword, emailVerification, WorkspaceSection, billing, onboarding, settingsPage, sidebar) sont attendus ; tout le reste signale un écran ou une action disparus.
+790 clés. Les namespaces de la couche exclue (auth, workspaces, insights, referral, apiKeysSection, forgotPassword, emailVerification, WorkspaceSection, billing, onboarding, settingsPage, sidebar) sont attendus ; tout le reste signale un écran ou une action disparus.
 
 | Namespace | Clés | Attendu (couche exclue) |
 |---|---|---|
 | `settingsPage` | 302 | oui |
-| `notes` | 106 | **non — à vérifier** |
 | `insights` | 90 | oui |
-| `workspaces` | 53 | oui |
+| `notes` | 83 | **non — à vérifier** |
+| `workspaces` | 52 | oui |
 | `referral` | 44 | oui |
 | `auth` | 42 | oui |
 | `noteEditor` | 40 | **non — à vérifier** |
@@ -764,7 +761,7 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 - `integrations` : `integrations.api.description`, `integrations.api.dialogTitle`, `integrations.api.manage`, `integrations.api.proRequired`, `integrations.api.title`, `integrations.api.viewPlans`, `integrations.cli.cloud.description`, `integrations.cli.cloud.label`, `integrations.cli.cloud.proRequired`, `integrations.cli.viewPlans`, `integrations.mcp.copied`, `integrations.mcp.copyUrl`, `integrations.mcp.description`, `integrations.mcp.learnMore`, `integrations.mcp.proRequired`, `integrations.mcp.step1`, `integrations.mcp.step2`, `integrations.mcp.step3`, `integrations.mcp.title`, `integrations.mcp.viewPlans`, `integrations.microsoftCalendar.connectFailedDescription`, `integrations.microsoftCalendar.disconnect`, `integrations.microsoftCalendar.disconnectConfirm`, `integrations.microsoftCalendar.disconnectDescription`, `integrations.plan.pro`, `integrations.sections.api`, `integrations.sections.mcp`
 - `microsoft` : `microsoft`
 - `noteEditor` : `noteEditor.share.button`, `noteEditor.share.dialog.accepted`, `noteEditor.share.dialog.copied`, `noteEditor.share.dialog.copyLink`, `noteEditor.share.dialog.createLink`, `noteEditor.share.dialog.description`, `noteEditor.share.dialog.editor`, `noteEditor.share.dialog.emailLabel`, `noteEditor.share.dialog.error.alreadyInvited`, `noteEditor.share.dialog.error.copyFailed`, `noteEditor.share.dialog.error.invalidEmail`, `noteEditor.share.dialog.error.inviteFailed`, `noteEditor.share.dialog.error.loadFailed`, `noteEditor.share.dialog.error.resendFailed`, `noteEditor.share.dialog.error.retry`, `noteEditor.share.dialog.error.revokeFailed`, `noteEditor.share.dialog.error.syncFailed`, `noteEditor.share.dialog.error.visibilityFailed`, `noteEditor.share.dialog.export`, `noteEditor.share.dialog.invitationActions`, `noteEditor.share.dialog.noResults`, `noteEditor.share.dialog.owner`, `noteEditor.share.dialog.pending`, `noteEditor.share.dialog.resend`, `noteEditor.share.dialog.resendSent`, `noteEditor.share.dialog.resendThrottled`, `noteEditor.share.dialog.revoke`, `noteEditor.share.dialog.searchPlaceholder`, `noteEditor.share.dialog.shareButton`, `noteEditor.share.dialog.syncAndShare`, `noteEditor.share.dialog.syncPrompt`, `noteEditor.share.dialog.teamAudience`, `noteEditor.share.dialog.title`, `noteEditor.share.dialog.viewer`, `noteEditor.share.dialog.visibility.domain`, `noteEditor.share.dialog.visibility.invited`, `noteEditor.share.dialog.visibility.label`, `noteEditor.share.dialog.visibility.link`, `noteEditor.share.dialog.visibility.private`, `noteEditor.share.dialog.visibility.privateOption`
-- `notes` : `notes.context.moveToFolder`, `notes.createMenu.teamSpace`, `notes.list.shared`, `notes.list.title`, `notes.overview.author.you`, `notes.overview.invite`, `notes.realtimeBanner.message`, `notes.realtimeBanner.upgrade`, `notes.spaces.accessRevoked`, `notes.spaces.accessRevokedActiveNote`, `notes.spaces.changeEmoji`, `notes.spaces.confirmMoveInTitle`, `notes.spaces.couldNotCreate`, `notes.spaces.couldNotDelete`, `notes.spaces.couldNotLeave`, `notes.spaces.couldNotMove`, `notes.spaces.couldNotMoveNote`, `notes.spaces.create`, `notes.spaces.createDescription`, `notes.spaces.createTitle`, `notes.spaces.created`, `notes.spaces.deleteConfirmTitle`, `notes.spaces.deleteSpace`, `notes.spaces.deleteTypeName`, `notes.spaces.deleted`, `notes.spaces.emptySpace`, `notes.spaces.emptyTeamHint`, `notes.spaces.folderNameTaken`, `notes.spaces.groups.optional`, `notes.spaces.groups.title`, `notes.spaces.invitedTo`, `notes.spaces.invitedToSpaces`, `notes.spaces.leave`, `notes.spaces.leaveConfirmDescription`, `notes.spaces.leaveConfirmTitle`, `notes.spaces.leaveDescription`, `notes.spaces.leaveDirectDescription`, `notes.spaces.leaveKeepsGroupAccess`, `notes.spaces.leaveTitle`, `notes.spaces.left`, `notes.spaces.members.addFailed`, `notes.spaces.members.addPeople`, `notes.spaces.members.addedToTeam`, `notes.spaces.members.empty`, `notes.spaces.members.inviteFooter`, `notes.spaces.members.invited`, `notes.spaces.members.managedByGroup`, `notes.spaces.members.noResults`, `notes.spaces.members.remove`, `notes.spaces.members.removeConfirm`, `notes.spaces.members.removeConfirmDescription`, `notes.spaces.members.removeKeepsGroupAccess`, `notes.spaces.members.removedFromTeam`, `notes.spaces.members.roleFromGroup`, `notes.spaces.members.roleUpdated`, `notes.spaces.members.searchPlaceholder`, `notes.spaces.members.stillViaGroups`, `notes.spaces.members.viaGroup`, `notes.spaces.members.you`, `notes.spaces.moveConfirm`, `notes.spaces.moveTo`, `notes.spaces.moveToSpace`, `notes.spaces.moved`, `notes.spaces.movedToPersonal`, `notes.spaces.nameAndIconLabel`, `notes.spaces.newSpace`, `notes.spaces.newSpaceInWorkspace`, `notes.spaces.noSpacesFound`, `notes.spaces.privateSpaces`, `notes.spaces.privateTooltip`, `notes.spaces.searchSpaces`, `notes.spaces.settings`, `notes.spaces.settingsTitle`, `notes.spaces.spaceRoot`, `notes.spaces.stillViaGroups`, `notes.spaces.teamSpaces`, `notes.spaces.teams.loadError`, `notes.spaces.teams.newTeam`, `notes.spaces.teamsMembers.accessAdmin`, `notes.spaces.teamsMembers.accessChanged`, `notes.spaces.teamsMembers.accessHint`, `notes.spaces.teamsMembers.accessLabel`, `notes.spaces.teamsMembers.accessMember`, `notes.spaces.teamsMembers.addTeamLabel`, `notes.spaces.teamsMembers.chooseTeam`, `notes.spaces.teamsMembers.noTeams`, `notes.spaces.teamsMembers.removeTeamConfirm`, `notes.spaces.teamsMembers.removeTeamConfirmDescription`, `notes.spaces.teamsMembers.removeTeamFromSpace`, `notes.spaces.teamsMembers.teamAdded`, `notes.spaces.teamsMembers.teamRemoved`, `notes.spaces.teamsMembers.title`, `notes.spaces.undo`, `notes.structureIntro.reopen`, `notes.upload.byokTooLargeNeedsAccount`, `notes.upload.byokTooLargeNeedsUpgrade`, `notes.upload.createAccount`, `notes.upload.diarizationRunsLocally`, `notes.upload.fileTooLarge`, `notes.upload.largeFileNote`, `notes.upload.openwhisprCloud`, `notes.upload.paidPlanRequired`, `notes.upload.switchToCloud`, `notes.upload.switchToCloudForLargeFiles`, `notes.upload.transcribingCloud`, `notes.upload.upgrade`
+- `notes` : `notes.createMenu.teamSpace`, `notes.overview.author.you`, `notes.overview.invite`, `notes.realtimeBanner.message`, `notes.realtimeBanner.upgrade`, `notes.spaces.accessRevoked`, `notes.spaces.accessRevokedActiveNote`, `notes.spaces.changeEmoji`, `notes.spaces.couldNotCreate`, `notes.spaces.couldNotDelete`, `notes.spaces.couldNotLeave`, `notes.spaces.create`, `notes.spaces.createDescription`, `notes.spaces.createTitle`, `notes.spaces.created`, `notes.spaces.deleteConfirmTitle`, `notes.spaces.deleteSpace`, `notes.spaces.deleteTypeName`, `notes.spaces.deleted`, `notes.spaces.folderNameTaken`, `notes.spaces.groups.optional`, `notes.spaces.groups.title`, `notes.spaces.invitedTo`, `notes.spaces.invitedToSpaces`, `notes.spaces.leave`, `notes.spaces.leaveConfirmDescription`, `notes.spaces.leaveConfirmTitle`, `notes.spaces.leaveDescription`, `notes.spaces.leaveDirectDescription`, `notes.spaces.leaveKeepsGroupAccess`, `notes.spaces.leaveTitle`, `notes.spaces.left`, `notes.spaces.members.addFailed`, `notes.spaces.members.addPeople`, `notes.spaces.members.addedToTeam`, `notes.spaces.members.empty`, `notes.spaces.members.inviteFooter`, `notes.spaces.members.invited`, `notes.spaces.members.managedByGroup`, `notes.spaces.members.noResults`, `notes.spaces.members.remove`, `notes.spaces.members.removeConfirm`, `notes.spaces.members.removeConfirmDescription`, `notes.spaces.members.removeKeepsGroupAccess`, `notes.spaces.members.removedFromTeam`, `notes.spaces.members.roleFromGroup`, `notes.spaces.members.roleUpdated`, `notes.spaces.members.searchPlaceholder`, `notes.spaces.members.stillViaGroups`, `notes.spaces.members.viaGroup`, `notes.spaces.members.you`, `notes.spaces.movedToPersonal`, `notes.spaces.nameAndIconLabel`, `notes.spaces.settingsTitle`, `notes.spaces.stillViaGroups`, `notes.spaces.teams.loadError`, `notes.spaces.teams.newTeam`, `notes.spaces.teamsMembers.accessAdmin`, `notes.spaces.teamsMembers.accessChanged`, `notes.spaces.teamsMembers.accessHint`, `notes.spaces.teamsMembers.accessLabel`, `notes.spaces.teamsMembers.accessMember`, `notes.spaces.teamsMembers.addTeamLabel`, `notes.spaces.teamsMembers.chooseTeam`, `notes.spaces.teamsMembers.noTeams`, `notes.spaces.teamsMembers.removeTeamConfirm`, `notes.spaces.teamsMembers.removeTeamConfirmDescription`, `notes.spaces.teamsMembers.removeTeamFromSpace`, `notes.spaces.teamsMembers.teamAdded`, `notes.spaces.teamsMembers.teamRemoved`, `notes.spaces.teamsMembers.title`, `notes.upload.byokTooLargeNeedsAccount`, `notes.upload.byokTooLargeNeedsUpgrade`, `notes.upload.createAccount`, `notes.upload.diarizationRunsLocally`, `notes.upload.fileTooLarge`, `notes.upload.largeFileNote`, `notes.upload.openwhisprCloud`, `notes.upload.paidPlanRequired`, `notes.upload.switchToCloud`, `notes.upload.switchToCloudForLargeFiles`, `notes.upload.transcribingCloud`, `notes.upload.upgrade`
 - `postMigration` : `postMigration.description`, `postMigration.done`, `postMigration.remindLater`, `postMigration.title`
 - `settingsModal` : `settingsModal.groups.account`, `settingsModal.sections.account.description`, `settingsModal.sections.account.label`, `settingsModal.sections.plansBilling.description`, `settingsModal.sections.plansBilling.label`, `settingsModal.sections.workspace.description`, `settingsModal.sections.workspace.label`
 - `upgradePrompt` : `upgradePrompt.limitDescription`, `upgradePrompt.pastDueDescription`, `upgradePrompt.paymentFailed`, `upgradePrompt.rollingWeeklyLimit`, `upgradePrompt.switchToLocal`, `upgradePrompt.switchToLocalDescription`, `upgradePrompt.updatePayment`, `upgradePrompt.updatePaymentDescription`, `upgradePrompt.upgradeDescription`, `upgradePrompt.upgradeToPro`, `upgradePrompt.useApiKey`, `upgradePrompt.useApiKeyDescription`, `upgradePrompt.weeklyLimit`
@@ -778,7 +775,7 @@ Source : `docs/upstream-merge/parity-checks.txt`.
 
 | État | Fonctionnalité | Aiguille cherchée | Chez nous | Amont |
 |---|---|---|---|---|
-| OK | `notes-note-delete-action` | `onDeleteNote` | 7 fichier(s) | 4 fichier(s) |
+| OK | `notes-note-delete-action` | `onDeleteNote` | 4 fichier(s) | 4 fichier(s) |
 | OK | `notes-note-delete-ipc` | `db-delete-note` | 1 fichier(s) | 1 fichier(s) |
 | OK | `notes-meeting-autoend-controller` | `meetingAutoEndController` | 1 fichier(s) | 1 fichier(s) |
 | OK | `notes-meeting-autoend-event` | `onMeetingAutoEndRequested` | 2 fichier(s) | 2 fichier(s) |
@@ -789,7 +786,7 @@ Source : `docs/upstream-merge/parity-checks.txt`.
 | OK | `meeting-system-audio-watchdog` | `meetingSystemAudioWatchdog` | 13 fichier(s) | 13 fichier(s) |
 | OK | `control-panel-new-note-menu` | `NewNoteMenu` | 4 fichier(s) | 4 fichier(s) |
 | OK | `control-panel-start-recording-for-note` | `startRecordingForNote` | 4 fichier(s) | 4 fichier(s) |
-| OK | `notes-folder-rename` | `startRenameFolder` | 2 fichier(s) | 3 fichier(s) |
+| OK | `notes-folder-rename` | `startRenameFolder` | 3 fichier(s) | 3 fichier(s) |
 | OK | `notes-folder-dialog` | `AddNotesToFolderDialog` | 6 fichier(s) | 6 fichier(s) |
 | OK | `notes-editor-record-control` | `NoteRecordControl` | 5 fichier(s) | 5 fichier(s) |
 
