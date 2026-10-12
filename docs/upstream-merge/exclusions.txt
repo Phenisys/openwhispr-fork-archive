@@ -66,7 +66,6 @@ src/components/notes/ShareNoteDialog.tsx
 src/components/notes/ShareVisibilityMenu.tsx
 src/components/notes/SpaceMembersDialog.tsx
 src/components/notes/SpaceSyncToastListener.tsx
-src/components/notes/SpacesTree.tsx
 src/components/referral-cards/SpectrogramCard.tsx
 src/components/referral-cards/generateWaveform.ts
 src/components/settings/ProfileSection.tsx
@@ -246,16 +245,14 @@ test/services/spacesService.test.js
 # couche exclue (leaderboard social, Insights/télémétrie, analytics,
 # en-têtes de session vers auth.openwhispr.com, onboarding de compte).
 # Sans ce classement, l'audit les signalait comme oublis potentiels.
-# Les 2 tests restants tranchés le 2026-10-08 (présents dans l'amont v1.10.2,
-# absents de notre arbre) : ils couvraient des modules purgés/exclus par le
-# fork — spacesTreeNoteActionClearance teste le composant cloud SpacesTree.tsx
-# (exclu) et settingsStoreRetiredGroqModels teste la table statique
-# src/config/retiredCloudModels.ts (exclue). Non portés tels quels (le test
-# groq dépend du sentinel one-shot de la table statique, que le fork a remplacé
-# par la reconcile registry-driven de settingsStore.ts) ; leurs FONCTIONNALITÉS
-# sont portées dans LocalNotesTree. Classés [excluded] (set actif, purge
-# l'audit) + tracés [excluded-reviewed] plus bas.
-test/components/spacesTreeNoteActionClearance.test.js
+# Le test restant tranché le 2026-10-08 (présent dans l'amont v1.10.2, absent de
+# notre arbre) : settingsStoreRetiredGroqModels teste la table statique
+# src/config/retiredCloudModels.ts (exclue). Non porté tel quel (il dépend du
+# sentinel one-shot de la table statique, que le fork a remplacé par la
+# reconcile registry-driven de settingsStore.ts). Classé [excluded] (set actif,
+# purge l'audit) + tracé [excluded-reviewed] plus bas.
+# (spacesTreeNoteActionClearance : SpacesTree.tsx n'est plus exclu — il est repris
+# tel quel de l'amont, cf. src/components/notes/localMode.ts ; le test aussi.)
 test/helpers/settingsStoreRetiredGroqModels.test.js
 src/components/InsightsView.tsx
 src/components/JoinYourTeamModal.tsx
@@ -313,7 +310,6 @@ test/stores/leaderboardParticipationStore.test.js
 # Format :  <chemin>  # <tag-amont> <date> <décision> — les exclusions
 # tracées s'inscrivent ici au fur et à mesure des fusions (on a LUS le diff
 # amont avant de confirmer l'exclusion).
-test/components/spacesTreeNoteActionClearance.test.js  # v1.10.2 2026-10-08 teste le composant cloud SpacesTree.tsx (exclu) ; le geste de clearance du slot d'actions note est porté dans LocalNotesTree — test non portable tel quel
 test/helpers/settingsStoreRetiredGroqModels.test.js  # v1.10.2 2026-10-08 teste la table statique src/config/retiredCloudModels.ts (exclue) ; le fork utilise la reconcile registry-driven (settingsStore.ts, sans sentinel one-shot) — test non portable tel quel
 [warn]
 *account*
