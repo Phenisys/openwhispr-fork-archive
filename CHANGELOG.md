@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.3] - 2026-10-12
+
+Version du fork Phenisys : mise à parité fonctionnelle avec l'amont officiel v1.10.2 (règle : intégrer d'abord tout l'amont, puis nos spécificités BYOK / local / self-hosted).
+
+### Fonctionnalités (portées de l'amont v1.10.2)
+
+- **Nouvelle note : bouton split dans la barre du panneau.** `+ Nouvelle note` crée une note dans l'espace/dossier courant ; sa chevron ajoute **Chat assistant** (et l'option *team space* amont, retirée ici avec la couche compte). (#24)
+- **Dossiers locaux : renommer et supprimer.** Entrée de renommage inline sur les dossiers de l'arbo et suppression confirmée (dialogue + toast d'erreur local), avec la même politique de menu que l'amont. (#24)
+- **Actions sur les notes locales.** Kebab note (dossier local) : *Afficher dans le gestionnaire de fichiers* et *Supprimer* (même flux IPC que l'amont). (#24)
+
+### Infrastructure / CI
+
+- **Porte de parité fonctionnelle** `scripts/upstream-parity-audit.mjs` : vérifie après chaque fusion amont que rien de non-exclu n'est perdu (contrat `docs/upstream-merge/`), + porte bloquante EXCLU-MODIFIÉ. (#24)
+- **Dépendances : patch de 3 paquets vulnérables du lockfile** — `source-map-js` 1.2.1→1.2.2 (DoS, high), `shell-quote` 1.9.0→1.12.0 (injection, critical) et `adm-zip` →0.6.1 ; la CI `npm audit` repasse verte. (#25)
+
+### Docs
+
+- Rapport de parité `docs/upstream-merge/` : un seul fichier (`parity-v1.10.2.md`), le double `parity-upstream-v1.10.2.md` est retiré.
+
 ## [1.10.2] - 2026-09-15
 
 A hotfix for 1.10.1. Generate AI Summary with your own API key or an enterprise provider no longer times out on a real transcript, a recording with nothing substantive in it gets a one-line summary instead of a blank page and an error, and OpenRouter models can read screenshots again.

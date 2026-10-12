@@ -44,7 +44,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 
 ## 2. Fichiers communs où l'amont a des lignes que nous n'avons pas
 
-Fichiers communs divergents : **119**, dont **102** contiennent des lignes amont absentes chez nous.
+Fichiers communs divergents : **120**, dont **102** contiennent des lignes amont absentes chez nous.
 La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche exclue : ce sont les candidates à la perte silencieuse de fonctionnalité.
 
 | Lignes amont absentes (non-cloud) | Lignes amont absentes (total) | Fichier |
@@ -74,7 +74,7 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 | 45 | 56 | `test/helpers/meetingTranscriptionRouting.test.js` |
 | 43 | 74 | `src/AppRouter.jsx` |
 | 43 | 62 | `test/helpers/dictationTranslationInference.test.js` |
-| 42 | 42 | `package-lock.json` |
+| 43 | 43 | `package-lock.json` |
 | 36 | 62 | `test/components/directionalContentPolicy.test.js` |
 | 36 | 41 | `test/helpers/useChatStreamingCancellation.test.js` |
 | 34 | 38 | `src/models/modelRegistryData.json` |
