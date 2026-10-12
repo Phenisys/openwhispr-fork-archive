@@ -30,6 +30,23 @@ Le manifeste `exclusions.txt` est la **forme mécanique de la divergence** : c'e
 lui qui évite de rejouer la purge à la main à chaque version. Toute entrée ajoutée
 est une décision d'exclusion — à relire et à versionner comme du code.
 
+## Principe : reprendre l'amont tel quel, ne coder que nos spécificités
+
+Chaque ligne qui diverge de l'amont est une ligne à re-arbitrer à chaque fusion.
+Donc : **un fichier amont est repris à l'identique** ; ce que le fork exclut
+(compte / cloud / workspace / billing / sync / MS-Calendar / enterprise) est
+branché **à ses frontières**, jamais en réécrivant le fichier.
+
+Exemple de référence — l'arbre de notes : `src/components/notes/SpacesTree.tsx`
+est le fichier amont ; son seul écart est le bloc d'imports, redirigé vers
+`src/components/notes/localMode.ts` (réponse « hors-ligne, sans compte, un seul
+utilisateur » pour les hooks auth/workspace, les permissions et les dialogues
+d'équipe). Une nouvelle version amont de `SpacesTree.tsx` se fusionne donc sans
+conflit ; seul un changement des imports cloud touche `localMode.ts`.
+
+Interdit : réécrire un composant amont en « version locale » (c'était
+`LocalNotesTree.tsx` : 470 lignes, structure différente, bug de portage en 1.10.3).
+
 ## Règle de parité fonctionnelle — l'amont d'abord, nos spécificités ensuite
 
 Ordre imposé, à chaque fusion :
@@ -48,7 +65,7 @@ Deux interdits, parce que les deux pertes constatées viennent de là :
   amont doit être soit porté, soit écarté avec une raison écrite.
 - **Exclure un fichier sans lire ce qu'il porte.** La couche cloud contient des
   fonctionnalités qui n'ont rien de cloud : `src/components/notes/SpacesTree.tsx`
-  (exclu) portait le **menu d'actions des notes** — supprimer, renommer — donc
+  (alors exclu) portait le **menu d'actions des notes** — supprimer, renommer — donc
   notre arbre local n'a ni bouton de suppression ni renommage de dossier.
   La fonctionnalité (et son test) doit être **portée dans notre équivalent
   local avant** d'inscrire le chemin dans `exclusions.txt`.
@@ -120,6 +137,9 @@ de faux échecs. Il ne retombe jamais sur un autre majeur.
   vérifiée à cette occasion : contrôleur, événement IPC, éligibilité et offre de
   résumé sont **à parité** (0 ligne d'écart sur les fichiers concernés) — sa
   perte éventuelle n'est pas un écart de code.
+- **2026-10-12 — arbre de notes repris de l'amont.** `LocalNotesTree.tsx`
+  (réécriture locale) remplacé par `SpacesTree.tsx` amont + `localMode.ts` ;
+  `spacesTreeNoteActionClearance.test.js` porté (sans la ligne équipe).
 - **2026-09-11 — stratégie « fusion amont » retenue**, portage commit-par-commit
   abandonné. Mesures : fusion directe de `v1.10.0` dans `main` = **103** conflits
   (37 contenu / 66 modify-delete) ; après merge de la branche de portage v1.9.0 =

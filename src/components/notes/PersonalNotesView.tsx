@@ -4,7 +4,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Plus, Sparkles } from "../icons";
 import { useToast } from "../ui/useToast";
 import NoteEditor from "./NoteEditor";
-import LocalNotesTree from "./LocalNotesTree";
+import SpacesTree from "./SpacesTree";
 import { ContainerOverview } from "./overview/ContainerOverview";
 import NotesStructureIntroDialog from "./NotesStructureIntroDialog";
 import ActionPicker from "./ActionPicker";
@@ -684,10 +684,12 @@ export default function PersonalNotesView({
               {t("notes.sidebar.actions")}
             </button>
           </div>
-          <LocalNotesTree
+          <SpacesTree
+            onDeleteNote={handleDelete}
+            onMoveNote={handleMoveNote}
+            onCreateFolderAndMove={handleCreateFolderAndMove}
             onNewNote={createNoteIn}
             onShowStructureIntro={() => setShowStructureIntro(true)}
-            onDeleteNote={handleDelete}
           />
         </div>
       </div>

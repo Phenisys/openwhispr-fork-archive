@@ -19,8 +19,8 @@
 # clé d'événement IPC, ou le nom du composant.
 
 # ─── Notes : actions sur une note depuis l'arborescence ────────────────────────
-# Le bouton « supprimer » vivait dans SpacesTree.tsx (exclu comme couche cloud).
-# La suppression doit rester accessible dans notre arbre local.
+# Le bouton « supprimer » vit dans SpacesTree.tsx, repris tel quel de l'amont
+# (seuls ses imports cloud sont redirigés vers localMode.ts).
 notes-note-delete-action | onDeleteNote | src/components/notes/*.tsx
 notes-note-delete-ipc | db-delete-note | src/helpers/*.js
 
@@ -42,8 +42,8 @@ control-panel-new-note-menu | NewNoteMenu | src/components/*.tsx,src/components/
 control-panel-start-recording-for-note | startRecordingForNote | src/hooks/*.ts,src/components/**/*.tsx
 
 # ─── Notes : structure locale, dossiers ───────────────────────────────────────
-# L'arbre de notes amont (SpacesTree, exclu) portait aussi les actions de
-# dossier. Notre arbre local doit offrir les mêmes gestes.
+# L'arbre de notes amont (SpacesTree, repris tel quel) porte aussi les actions
+# de dossier ; ces gestes doivent y rester.
 notes-folder-rename | startRenameFolder | src/components/notes/*.tsx
 notes-folder-dialog | AddNotesToFolderDialog | src/components/notes/*.tsx
 notes-editor-record-control | NoteRecordControl | src/components/notes/*.tsx
