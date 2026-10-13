@@ -307,6 +307,7 @@ test/stores/leaderboardParticipationStore.test.js
 #     src/helpers/enterpriseProviderErrors.js (module conservé).
 src/components/integrations/McpPane.tsx
 src/components/LeaderboardSkeleton.tsx
+test/components/apiKeysSection.test.js
 src/utils/connectorEligibility.ts
 test/helpers/noteFieldSync.test.js
 test/helpers/noteCreateReconciliation.test.js
