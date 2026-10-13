@@ -35,7 +35,11 @@ jobs:
     if: needs.changes.outputs.desktop == 'true'
     runs-on: ubuntu-latest
     outputs:
-      build: ${{ github.event_name != 'pull_request' || (github.base_ref == 'main' && needs.changes.outputs.build == 'true') }}
+      # Phenisys: repo privé = minutes facturées (macOS x10, Windows x2). Les builds
+      # natifs ne tournent plus que sur déclenchement manuel (workflow_dispatch,
+      # signing=unsigned) ; PR et push ne lancent que `quality`. Voir
+      # docs/upstream-merge/workflows-policy.txt.
+      build: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -294,7 +298,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64, arm64]
+        # Phenisys: x64 retiré (arm64 seul) — coût macOS x10.
+        arch: [arm64]
     steps:
       - uses: actions/checkout@v4
 
