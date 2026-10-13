@@ -236,7 +236,6 @@ src/components/notes/SpaceNameField.tsx
 src/components/notes/SpaceSettingsDialog.tsx
 src/hooks/useCanCreateTeamSpace.ts
 src/hooks/useMemberRoster.ts
-test/components/newNoteMenu.test.js
 test/hooks/canCreateTeamSpace.test.js
 test/services/spacesService.test.js
 
@@ -306,11 +305,33 @@ test/stores/leaderboardParticipationStore.test.js
 #     import d'allowlist pointe désormais sur enterpriseAiProviders.js.
 #   test/helpers/enterpriseEndpointGuard.test.js  test de
 #     src/helpers/enterpriseProviderErrors.js (module conservé).
+src/components/integrations/McpPane.tsx
+src/components/LeaderboardSkeleton.tsx
+src/utils/connectorEligibility.ts
+test/helpers/noteFieldSync.test.js
+test/helpers/noteCreateReconciliation.test.js
+test/helpers/noteCloudCollision.test.js
+test/helpers/noteCreateConcurrentEdits.test.js
+test/helpers/noteRevisionRecovery.test.js
 [excluded-reviewed]
 # Format :  <chemin>  # <tag-amont> <date> <décision> — les exclusions
 # tracées s'inscrivent ici au fur et à mesure des fusions (on a LUS le diff
 # amont avant de confirmer l'exclusion).
 test/helpers/settingsStoreRetiredGroqModels.test.js  # v1.10.2 2026-10-08 teste la table statique src/config/retiredCloudModels.ts (exclue) ; le fork utilise la reconcile registry-driven (settingsStore.ts, sans sentinel one-shot) — test non portable tel quel
+src/components/InsightsView.tsx  # v1.10.3 2026-10-12 skeletons de chargement du dashboard Insights (couche insights/télémétrie exclue) ; rien de non-cloud à porter
+src/components/LeaderboardPodium.tsx  # v1.10.3 2026-10-12 refonte UI du leaderboard social (exclu) ; rien à porter
+src/components/LeaderboardSection.tsx  # v1.10.3 2026-10-12 skeletons/refonte du leaderboard social (exclu) ; rien à porter
+src/config/retiredCloudModels.ts  # v1.10.3 2026-10-12 rotation du sentinel Tinfoil + remap deepseek-v4-flash→v4-1-flash ; le fork n'a pas de catalogue Tinfoil et sa reconcile settingsStore est registry-driven ; rien à porter
+src/helpers/microsoftCalendarManager.js  # v1.10.3 2026-10-12 alias/own-address, attendees ressource, tenantId — Microsoft Calendar (exclu)
+src/helpers/microsoftCalendarOAuth.js  # v1.10.3 2026-10-12 tenantId depuis l'id_token — Microsoft Calendar (exclu)
+test/components/authenticationStep.test.js  # v1.10.3 2026-10-12 teste AuthenticationStep (login/Apple sign-in, exclu)
+test/components/leaderboardNavigation.test.js  # v1.10.3 2026-10-12 teste le leaderboard social (exclu)
+test/components/leaderboardStates.test.js  # v1.10.3 2026-10-12 teste le leaderboard social (exclu)
+test/helpers/accountOwnershipDatabase.test.js  # v1.10.3 2026-10-12 teste la propriété de compte (couche compte exclue)
+test/helpers/accountScopeIpc.test.js  # v1.10.3 2026-10-12 teste le scope de compte IPC (exclu)
+test/helpers/accountScopeRestoreContract.test.js  # v1.10.3 2026-10-12 teste le contrat de restore par compte (exclu)
+test/helpers/microsoftCalendarManager.test.js  # v1.10.3 2026-10-12 teste Microsoft Calendar (exclu)
+test/helpers/retiredCloudModels.test.js  # v1.10.3 2026-10-12 teste la table statique retiredCloudModels.ts (exclue) — cf. settingsStoreRetiredGroqModels
 [warn]
 *account*
 *billing*

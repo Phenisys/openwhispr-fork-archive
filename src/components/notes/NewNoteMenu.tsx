@@ -16,7 +16,9 @@ import {
 import { cn } from "../lib/utils";
 
 // Matched to the search bar it sits beside: the same translucent fill that
-// lifts on hover, under the same hairline.
+// lifts on hover, under the same hairline. The note's Share control keeps its
+// own pill, so these apply to this instance of the shared split button rather
+// than to the definition both share.
 const SOFT_GROUP_CLASS = "bg-foreground/4 dark:bg-white/5";
 const SOFT_SEGMENT_CLASS =
   "hover:bg-foreground/6 focus-visible:bg-foreground/6 focus-visible:ring-1 focus-visible:ring-primary/30 dark:hover:bg-white/8 dark:focus-visible:bg-white/8";
@@ -28,19 +30,14 @@ interface NewNoteMenuProps {
   onNewChat?: () => void;
 }
 
-/**
- * The topbar's split "New note" button; the chevron offers the other things to
- * create. Ported from upstream v1.10.2 (2026-10-08) with the team-space option
- * removed — that branch depends on useCanCreateTeamSpace / CreateSpaceDialog,
- * both purged with the account/cloud layer. See [excluded-reviewed].
- */
+/** The topbar's split "New note" button; the chevron offers the other things to create. */
 export default function NewNoteMenu({ onNewNote, onNewChat }: NewNoteMenuProps) {
   const { t } = useTranslation();
   const itemChosenRef = useRef(false);
 
-  // A new note focuses nothing (the editor mounts fresh); dismissing the menu
-  // returns focus to the chevron, as Radix does by default. A chat opens a tab
-  // that takes focus itself, so those closes keep it.
+  // The chat input takes focus itself, so selecting chat keeps it. A new note
+  // focuses nothing (the editor mounts fresh), and dismissing the menu returns
+  // focus to the chevron, as Radix does by default.
   const keepFocus = (action: () => void) => () => {
     itemChosenRef.current = true;
     action();

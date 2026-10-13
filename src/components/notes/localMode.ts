@@ -5,7 +5,10 @@
 // permission helper and dialog. Everything is permitted, nothing is team-scoped.
 import type { FolderItem, NoteItem, SpaceItem, Workspace } from "../../types/electron";
 
-export const useAuth = () => ({ isSignedIn: false, user: null as { id: string } | null });
+export const useAuth = () => ({
+  isSignedIn: false,
+  user: null as { id: string; name?: string | null; email?: string | null } | null,
+});
 export const useTeamSpacesCapability = (_isSignedIn: boolean) => false;
 export const useCanCreateTeamSpace = () => false;
 export const useWorkspace = () => ({ workspaces: [] as Workspace[], loaded: true });

@@ -14,6 +14,7 @@ export interface CloudNote {
   space_id?: string | null;
   updated_at?: string | null;
   updated_by_user_id?: string | null;
+  revision?: number;
 }
 const KEY = "noteConflicts.clientIds";
 

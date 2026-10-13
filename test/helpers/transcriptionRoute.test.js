@@ -8,7 +8,6 @@ const resolve = async (settings, extra = {}) => {
   return resolveTranscriptionRoute({ settings, ...extra });
 };
 
-
 test("self-hosted routes to the configured server and wins over stale flags", async () => {
   const route = await resolve({
     transcriptionMode: "self-hosted",
@@ -295,7 +294,6 @@ test("openai and groq route to fixed endpoints with provider-validated models", 
   assert.deepEqual(groqStale.auth, { scheme: "bearer", keyRef: "groq" });
 });
 
-
 test("request overrides win: explicit model and effective language", async () => {
   const route = await resolve(
     { cloudTranscriptionProvider: "groq", preferredLanguage: "de-DE" },
@@ -305,3 +303,13 @@ test("request overrides win: explicit model and effective language", async () =>
   assert.equal(route.language, "ja");
 });
 
+test("Orukeet fallback preserves the custom Bearer key", async () => {
+  const route = await resolve({
+    transcriptionMode: "self-hosted",
+    remoteTranscriptionUrl: "https://orukeet.gizmovoice.ai/v1",
+    remoteTranscriptionModel: "orukeet-v0.1.0",
+    cloudTranscriptionProvider: "custom",
+  });
+  assert.equal(route.endpoint, "https://orukeet.gizmovoice.ai/v1/audio/transcriptions");
+  assert.deepEqual(route.auth, { scheme: "bearer", keyRef: "custom" });
+});

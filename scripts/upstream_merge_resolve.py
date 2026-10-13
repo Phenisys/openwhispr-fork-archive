@@ -145,6 +145,9 @@ def scan_dangling_specifiers(repo):
             if resolves(path.parent, spec):
                 continue
             line = text[: match.start()].count("\n") + 1
+            # A specifier in a line comment is not an import (e.g. `// x: require("./a")`).
+            if text.splitlines()[line - 1].lstrip().startswith(("//", "*", "/*")):
+                continue
             dangling.setdefault(str(rel), []).append((line, spec))
     return dangling
 

@@ -9,7 +9,12 @@ const english = require("../../src/locales/en/translation.json");
 // /v1/models list already omits it. The default lookup must follow, otherwise
 // every reconciled selection lands on whatever Tinfoil happens to list first.
 const LIVE_CATALOG = [
-  { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash", description: "", supportsThinking: true },
+  {
+    id: "deepseek-v4-1-flash",
+    name: "DeepSeek V4.1 Flash",
+    description: "",
+    supportsThinking: true,
+  },
   { id: "glm-5-3", name: "GLM-5.3", description: "", supportsThinking: true },
   { id: "gpt-oss-120b", name: "GPT-OSS 120B", description: "", supportsThinking: true },
 ];
@@ -26,7 +31,7 @@ test("tinfoil default model follows the glm-5-3 replacement", async (t) => {
   });
 
   await t.test("still falls back to the first served model when the default is gone", () => {
-    assert.equal(pickDefaultTinfoilModel(LIVE_CATALOG.slice(0, 1))?.id, "deepseek-v4-flash");
+    assert.equal(pickDefaultTinfoilModel(LIVE_CATALOG.slice(0, 1))?.id, "deepseek-v4-1-flash");
   });
 
   await t.test("registry names the default and no longer ships glm-5-2", () => {
@@ -51,7 +56,7 @@ test("tinfoil default model follows the glm-5-3 replacement", async (t) => {
 
 // Tinfoil's catalog is fetched live and cached, so its order is Tinfoil's, not
 // ours. Anything that resolves a default from list position lands on whatever
-// the enclave happens to serve first — deepseek-v4-flash today.
+// the enclave happens to serve first — deepseek-v4-1-flash today.
 test("a cached catalog does not displace the named Tinfoil default", async (t) => {
   installBrowserGlobals(t, {
     initialStorage: {
@@ -97,10 +102,6 @@ test("a cached catalog does not displace the named Tinfoil default", async (t) =
   assert.equal(effective.cleanupModel, "glm-5-3");
 });
 
-// The app tells a user when Tinfoil retires the model they picked. The startup
-// sweep now moves them before the live-catalog reconcile can, so the notice has
-// to come from the sweep or it is lost.
-
 // Every live site that resolves a provider's default reads the name the
 // registry gives it, through one helper.
 test("a provider's named default beats its list position", async (t) => {
@@ -118,7 +119,10 @@ test("a provider's named default beats its list position", async (t) => {
     // The seed leads with its own default, so only a list that doesn't can
     // tell the two rules apart.
     assert.equal(
-      pickDefaultModelId({ models: [{ id: "listed-first" }, { id: "named" }], defaultModel: "named" }),
+      pickDefaultModelId({
+        models: [{ id: "listed-first" }, { id: "named" }],
+        defaultModel: "named",
+      }),
       "named"
     );
     assert.equal(pickDefaultModelId(byId.tinfoil), "glm-5-3");

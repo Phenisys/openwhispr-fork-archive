@@ -1,4 +1,7 @@
 import { en as enPrompts, type PromptBundle } from "../../locales/prompts";
+// Single source for the note/meeting wrapper prompts: builtinActions owns them,
+// PromptStudio only overrides them.
+import { BASE_SYSTEM_PROMPT, MEETING_SYSTEM_PROMPT } from "../../helpers/builtinActions.js";
 
 // When changing this text, move its old hash to the retired set in
 // src/config/retiredPrompts.js and update the current-hash snapshot there.
@@ -6,41 +9,6 @@ const DEFAULT_CHAT_AGENT_PROMPT =
   "You are a helpful voice assistant. Respond concisely and conversationally. " +
   "Keep answers brief unless the user asks for detail. " +
   "You may be given a transcription of spoken input, so handle informal phrasing gracefully.";
-
-// Note enhancement (non-meeting) system prompt — historically BASE_SYSTEM_PROMPT
-// in actionProcessingStore.
-const DEFAULT_NOTE_ENHANCEMENT_PROMPT = `You are a note enhancement assistant. The user will provide raw notes — possibly voice-transcribed, rough, or unstructured. Your job is to clean them up according to the instructions below while preserving all original meaning and information. Output clean markdown.
-
-FORMAT RULES (strict):
-- Do NOT include any preamble: no title, no date/time/location, no attendee list, no topic header. Start directly with the content.
-- Do NOT use tables, horizontal rules, or block quotes.
-- Do NOT list or guess participant names/roles.
-- Keep the tone professional and concise. Bias toward brevity.
-
-Instructions: `;
-
-// Meeting notes enhancement system prompt — historically MEETING_SYSTEM_PROMPT
-// in actionProcessingStore.
-const DEFAULT_MEETING_ENHANCEMENT_PROMPT = `You are a professional meeting notes assistant. You will receive any manual notes the user took, followed by a meeting transcript under a "## Meeting Transcript" heading. Each transcript line is labeled: "You:" marks the user's speech, "Them:" marks unidentified other participants, and a real speaker name (e.g. "Alice:") marks an identified participant.
-
-Your job is to produce clean, actionable meeting notes in markdown. Follow these rules:
-
-FORMAT RULES (strict):
-- Do NOT include any preamble: no title, no "# Meeting Notes", no date/time/location, no attendee list, no topic header. Start directly with the summary.
-- Do NOT use tables, horizontal rules, or block quotes.
-- Do NOT list or guess participant names/roles.
-- Start with a concise 1–2 sentence summary of what the meeting was about.
-- Use clear section headings: ## Key Discussion Points, ## Decisions Made, ## Action Items, ## Follow-ups (omit any section that has no content).
-- Under Action Items, use checkboxes (\`- [ ]\`) and attribute each item to "You" or "Them" where clear.
-
-CONTENT RULES:
-- Preserve important quotes or specific commitments verbatim when they carry meaning.
-- Remove filler, small talk, false starts, and repeated/redundant content.
-- Where speakers refer to the same topic across multiple turns, consolidate into a coherent point rather than listing every utterance.
-- If the user included manual notes alongside the transcript, integrate them — they represent the user's emphasis on what matters most.
-- Keep the tone professional and concise. Bias toward brevity.
-
-Instructions: `;
 
 // Note title generation prompt — historically TITLE_SYSTEM_PROMPT in generateTitle.ts.
 const DEFAULT_TITLE_PROMPT =
@@ -73,6 +41,14 @@ const DEFAULT_TOOL_INSTRUCTIONS =
   "Use copy_to_clipboard when the user asks you to copy something to their clipboard. " +
   "Use get_calendar_events to check the user's schedule, upcoming meetings, or calendar events.";
 
+// Appended per request, not baked into the default: the panel renders markdown.
+export const PLAIN_TEXT_RESPONSE_SUFFIX =
+  "\n\nOUTPUT FORMAT: Your answer will be inserted as plain text exactly where the user is typing, " +
+  "inside another application. Write plain prose with no markdown: no asterisks, underscores, " +
+  "backticks, heading marks, bullet or numbered-list markers, tables, or link syntax. " +
+  "Use ordinary sentences and paragraphs. If several items must be listed, put each on its " +
+  "own line with no marker.";
+
 export const PROMPT_KINDS = {
   cleanup: {
     i18nKey: "cleanupPrompt" as const,
@@ -92,11 +68,11 @@ export const PROMPT_KINDS = {
   },
   noteEnhancement: {
     i18nKey: null,
-    fallback: DEFAULT_NOTE_ENHANCEMENT_PROMPT,
+    fallback: BASE_SYSTEM_PROMPT,
   },
   meetingEnhancement: {
     i18nKey: null,
-    fallback: DEFAULT_MEETING_ENHANCEMENT_PROMPT,
+    fallback: MEETING_SYSTEM_PROMPT,
   },
   titleGeneration: {
     i18nKey: null,
