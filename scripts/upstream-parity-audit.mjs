@@ -35,6 +35,7 @@ import { dirname, resolve } from "node:path";
 const UPSTREAM_URL = "https://github.com/OpenWhispr/openwhispr.git";
 const MANIFEST = "docs/upstream-merge/exclusions.txt";
 const CHECKS = "docs/upstream-merge/parity-checks.txt";
+const WORKFLOWS = "docs/upstream-merge/workflows-policy.txt";
 
 /** Domaine de la couche exclue : sert UNIQUEMENT à prioriser la relecture. */
 const CLOUD_HINTS =
@@ -179,6 +180,19 @@ function usedI18nKeys(ref, root) {
   return out;
 }
 
+function loadWorkflowPolicy(root) {
+  const file = resolve(root, WORKFLOWS);
+  const policy = new Map();
+  if (!existsSync(file)) return policy;
+  for (const raw of readFileSync(file, "utf8").split("\n")) {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) continue;
+    const [name, state] = line.split("|").map((part) => part.trim());
+    if (name && state) policy.set(name, state);
+  }
+  return policy;
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help || (!args.tag && !args.upstream)) {
@@ -267,10 +281,21 @@ function main() {
     return { ...check, state, upstreamHits, ourHits };
   });
 
+  // ── 5. workflows GitHub Actions : chaque workflow amont doit avoir une politique ──
+  // (repo privé : les minutes sont facturées, un workflow ajouté par l'amont ne
+  // doit pas s'activer sans décision explicite).
+  const workflowPolicy = loadWorkflowPolicy(root);
+  const upstreamWorkflows = git(["ls-tree", "--name-only", upstreamRef, ".github/workflows/"], { cwd: root })
+    .split("\n")
+    .filter((path) => /\.ya?ml$/.test(path))
+    .map((path) => path.split("/").pop());
+  const unknownWorkflows = upstreamWorkflows.filter((name) => !workflowPolicy.has(name));
+
   const breaches = [
     ...unclassified.map((path) => `fichier amont non classé : ${path}`),
     ...checks.filter((c) => c.state === "MANQUANT").map((c) => `fonctionnalité manquante : ${c.id}`),
     ...checks.filter((c) => c.state === "PÉRIMÉ").map((c) => `sonde périmée : ${c.id}`),
+    ...unknownWorkflows.map((name) => `workflow amont sans politique (${WORKFLOWS}) : ${name}`),
   ];
 
   // ── rapport ────────────────────────────────────────────────────────────────

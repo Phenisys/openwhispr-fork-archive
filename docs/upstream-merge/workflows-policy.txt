@@ -1,0 +1,34 @@
+# Politique des workflows GitHub Actions — Phenisys/openwhispr (dépôt PRIVÉ)
+#
+# Rôle : en privé, les minutes sont facturées (Linux x1, Windows x2, macOS x10,
+# plan gratuit = 2000 min/mois). Chaque workflow de l'amont doit avoir une
+# décision ici ; `scripts/upstream-parity-audit.mjs` signale tout workflow amont
+# absent de cette liste (sinon il s'activerait sans décision après une fusion).
+#
+# Format : <fichier.yml> | enabled | disabled | manual | <note>
+#   enabled  : actif tel que l'amont le livre
+#   manual   : actif mais lancé seulement à la main (workflow_dispatch)
+#   disabled : désactivé côté GitHub (`gh workflow disable <nom>`), fichier INCHANGÉ
+#              → aucune divergence de fichier, aucun conflit de fusion.
+#
+# Seul écart de fichier assumé : build-and-notarize.yml (2 modifications, marquées
+# « Phenisys: » dans le YAML) — à ré-appliquer après chaque fusion amont.
+
+build-and-notarize.yml            | manual   | PR/push = job `quality` seul ; builds natifs sur workflow_dispatch (signing=unsigned) ; macOS arm64 seul ; Linux inchangé (AppImage, deb, rpm, tar.gz)
+ci-changes.yml                    | enabled  | workflow réutilisable (Linux, quelques secondes)
+lockfile-lint.yml                 | enabled  | < 1 min
+release-interne.yml               | manual   | notre release, NON SIGNÉE uniquement pour l'instant (spécifique Phenisys)
+release.yml                       | disabled | release signée amont (secrets Apple/Azure absents) ; on utilise release-interne
+codeql.yml                        | disabled | CodeQL en privé exige GitHub Advanced Security (payant)
+llm-canary.yml                    | disabled | secrets amont absents
+stt-canary.yml                    | disabled | secrets amont absents
+mobile-ci.yml                     | disabled | application mobile hors périmètre du fork pour l'instant (décision 2026-10-13)
+update-nix.yml                    | disabled | soumission aux registres amont
+update-winget.yml                 | disabled | soumission aux registres amont
+build-linux-text-monitor.yml      | enabled  | déclenché seulement si le .c change (~1 min)
+build-meeting-aec-helper.yml      | enabled  | déclenché seulement si native/meeting-aec-helper change
+build-windows-fast-paste.yml      | enabled  | idem (~1 min)
+build-windows-key-listener.yml    | enabled  | idem
+build-windows-mic-listener.yml    | enabled  | idem
+build-windows-system-audio-helper.yml | enabled | idem
+build-windows-text-monitor.yml    | enabled  | idem
