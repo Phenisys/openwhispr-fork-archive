@@ -78,8 +78,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     "permission-guide-action",
     (callback) => (_event, action) => callback(action)
   ),
-  markMacAccessibilityFeaturesReady: () =>
-    ipcRenderer.send("mac-accessibility-features-ready"),
+  markMacAccessibilityFeaturesReady: () => ipcRenderer.send("mac-accessibility-features-ready"),
   beginOnboardingDemo: (session) => ipcRenderer.invoke("onboarding-demo-begin", session),
   endOnboardingDemo: (id) => ipcRenderer.invoke("onboarding-demo-end", id),
   stopOnboardingDemo: (id) => ipcRenderer.invoke("onboarding-demo-stop", id),
