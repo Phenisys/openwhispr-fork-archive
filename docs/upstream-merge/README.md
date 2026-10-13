@@ -123,6 +123,15 @@ plus récent installé (nvm **et** fnm) et le **valide par une sonde tsx** : si 
 n'est sain, il s'arrête avec un message explicite (code 70) plutôt que de rapporter
 de faux échecs. Il ne retombe jamais sur un autre majeur.
 
+## Repère de version : `upstreamBase`
+
+La version du fork reste un semver croissant (1.10.4, 1.10.5…) : `electron-updater`
+ne comprend ni `1.10.3.1` (invalide) ni `+fork.N` (ignoré à la comparaison).
+Le lien avec l'amont est porté par le champ `upstreamBase` de `package.json`, à
+mettre à jour **dans la PR de fusion** (ex. `"upstreamBase": "1.10.3"`). Il est affiché
+dans Réglages → Mises à jour (`1.10.5 · upstream 1.10.3`), repris dans le titre de la
+release (« 1.10.5 — base amont 1.10.3 ») et l'en-tête du CHANGELOG.
+
 ## Historique des décisions
 
 - **2026-10-07 — parité fonctionnelle rendue mécanique.** Audit
