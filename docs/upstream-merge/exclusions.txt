@@ -308,6 +308,14 @@ test/stores/leaderboardParticipationStore.test.js
 src/components/integrations/McpPane.tsx
 src/components/LeaderboardSkeleton.tsx
 test/components/apiKeysSection.test.js
+test/components/shareNoteDialogLink.test.js
+test/components/signOutEndsMeetingRecording.test.js
+test/helpers/microsoftCalendarOAuth.test.js
+test/helpers/settingsStoreMicrosoftAccounts.test.js
+test/hooks/noteEditCancellation.test.js
+test/hooks/noteEditSurfaces.test.js
+test/hooks/signInCloudNudge.test.js
+src/hooks/useSignInCloudNudge.tsx
 src/utils/connectorEligibility.ts
 test/helpers/noteFieldSync.test.js
 test/helpers/noteCreateReconciliation.test.js

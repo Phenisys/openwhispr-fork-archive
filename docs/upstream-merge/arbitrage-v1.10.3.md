@@ -43,4 +43,11 @@ Principe : version amont comme référence ; on ne retire que la couche exclue, 
 | Sync cloud | `noteFieldSync`, `noteCreateReconciliation`, `noteCloudCollision`, `noteCreateConcurrentEdits`, `noteRevisionRecovery` (tests) | Excluent `SyncService` / `fakeCloud` : ajoutés à `[excluded]`. |
 | Autres | `useConnectorAccess.ts` | Pas de couche plan : `isPaid: true`, politique d'organisation conservée. `connectorEligibility.ts` exclu. |
 
+Tests retirés après balayage (échouent hors-ligne, couche exclue) : `shareNoteDialogLink`, `signOutEndsMeetingRecording`,
+`microsoftCalendarOAuth`, `settingsStoreMicrosoftAccounts`, `noteEditCancellation`, `noteEditSurfaces`, `signInCloudNudge`
+(+ `useSignInCloudNudge.tsx`), `apiKeysSection`. Adaptés : `audioManager{CleanupOutput,InterruptedRecording}` (plus d'usage/sync cloud),
+`integrationsView` / `connectorsSection` (plus de plan, de volets API/MCP), `meetingNotificationFolderRefresh`, `assistantNoteUndoListener`.
+Correction trouvée par le balayage : `audioManager` référençait `managedResolution` (retiré) — classification des échecs de fournisseurs proxifiés rétablie.
+Balayage : ~50 tests `test/helpers` échouent faute d'Electron/better-sqlite3 installés (`--ignore-scripts`), à l'identique de l'amont v1.10.3 (vérifié sur un worktree amont) ; la CI tranche.
+
 Script : `upstream_merge_resolve.py` ignore désormais les spécificateurs en commentaire de ligne.

@@ -96,7 +96,8 @@ test("an interrupted recording comes back as a failed row with its audio, then l
     },
     { id: 7, bytes: 4096, metadata: { durationMs: 840000, provider: null, model: null } },
   ]);
-  assert.deepEqual(pushes, [["transcription", 7]]);
+  // Fork: no cloud sync, nothing to push.
+  assert.deepEqual(pushes, []);
   assert.equal(recording.discarded, true);
 });
 

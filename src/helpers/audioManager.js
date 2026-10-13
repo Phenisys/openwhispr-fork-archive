@@ -3702,11 +3702,8 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
             .filter(Boolean)
             .slice(0, 100),
         });
-        // Managed Azure is enterprise: its failures keep their own shape.
         const classifyProxyFailure = (err) =>
-          managedResolution
-            ? err
-            : asProviderError(err, { provider: proxySpec.displayName, surface: "transcription" });
+          asProviderError(err, { provider: proxySpec.displayName, surface: "transcription" });
         let result;
         try {
           result = await call(proxyPayload);
