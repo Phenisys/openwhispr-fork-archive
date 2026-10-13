@@ -403,73 +403,6 @@ test("the note's chat gets the note's participants, parsed once", async (t) => {
   await unmount();
 });
 
-test("the note's chat learns who is viewing the note and its calendar event", async (t) => {
-  t.after(() => {
-    delete globalThis.__embeddedChatOptions;
-    delete globalThis.__noteEditorAuth;
-  });
-  globalThis.__noteEditorAuth = {
-    isSignedIn: true,
-    user: { id: "user-chad", email: "chad@example.com" },
-  };
-  const { render, unmount } = await loadNoteEditor(t);
-  const options = () => globalThis.__embeddedChatOptions;
-
-  // A local note is the user's own.
-  await render(ENHANCEMENT, { note: { ...NOTE, calendar_event_id: "evt-1" } });
-  assert.equal(options().noteOwnedByUser, true);
-  assert.equal(options().selfEmail, "chad@example.com");
-  assert.equal(options().noteCalendarEventId, "evt-1");
-
-  // A team note someone else recorded is not.
-  await render(ENHANCEMENT, {
-    note: {
-      ...NOTE,
-      cloud_id: "cloud-1",
-      owner_user_id: "user-alice",
-      calendar_event_id: null,
-    },
-  });
-  assert.equal(options().noteOwnedByUser, false);
-  assert.equal(options().noteCalendarEventId, null);
-  await unmount();
-});
-
-test("the note's chat labels speakers as get_note does and leaves attendees to the attendee block", async (t) => {
-  t.after(() => {
-    delete globalThis.__embeddedChatOptions;
-    delete globalThis.__noteEditorAuth;
-  });
-  globalThis.__noteEditorAuth = {
-    isSignedIn: true,
-    user: { id: "user-chad", name: "Chad", email: "chad@example.com" },
-  };
-  const { render, unmount } = await loadNoteEditor(t);
-  const transcript = JSON.stringify([
-    { text: "I'll send the deck.", source: "mic", timestamp: 0 },
-    { text: "Thanks.", source: "system", timestamp: 3 },
-  ]);
-  const chatTranscript = () => globalThis.__embeddedChatOptions.noteTranscript;
-
-  const lines = "Note taker: I'll send the deck.\nOthers: Thanks.";
-  await render(ENHANCEMENT, { note: { ...NOTE, transcript } });
-  assert.equal(
-    chatTranscript(),
-    `## Meeting Context\nThe user taking these notes ("Note taker" in the transcript) is Chad <chad@example.com>.\n\n${lines}`
-  );
-  assert.doesNotMatch(chatTranscript(), /Dana Wu|Invited participants/);
-
-  // A teammate's recording: its note taker is the teammate, so the user isn't named.
-  await render(ENHANCEMENT, {
-    note: { ...NOTE, transcript, cloud_id: "cloud-1", owner_user_id: "user-alice" },
-  });
-  assert.equal(
-    chatTranscript(),
-    `## Meeting Context\nSomeone other than the user took these notes ("Note taker" in the transcript).\n\n${lines}`
-  );
-  await unmount();
-});
-
 // The note's ask bar.
 function findBottomBar(tree) {
   let bar = null;
@@ -732,27 +665,6 @@ for (const surface of ["picker", "floating", "sidebar", "slash"]) {
     assert.equal(findDockedChat(latest()).props.slashCommands, undefined);
   });
 }
-
-test("a read-only shared note offers no action picker, chips, slash menu or summary generation", async (t) => {
-  globalThis.__noteActions = [FOLLOW_UP];
-  t.after(() => delete globalThis.__noteActions);
-  const { render, latest, unmount } = await loadNoteEditor(t, "viewer");
-  try {
-    await render(undefined, {
-      note: { ...NOTE, cloud_id: "shared-note", enhanced_content: null },
-      onRunNoteAction() {
-        throw new Error("must not run");
-      },
-    });
-    const bar = findBottomBar(latest()).props;
-    assert.ok(!bar.actionPicker);
-    assert.ok(!bar.actionChips);
-    assert.equal(bar.slashCommands, undefined);
-    assert.ok(!bar.callout);
-  } finally {
-    await unmount();
-  }
-});
 
 // The body editor (RichTextEditor, mocked) in the tree the component returned.
 function bodyEditor(tree) {

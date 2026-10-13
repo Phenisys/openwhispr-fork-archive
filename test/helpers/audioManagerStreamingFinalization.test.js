@@ -1459,60 +1459,6 @@ test("language re-transcription skips streaming cleanup", async (t) => {
   assert.equal(usage.length, 0);
 });
 
-test("a low score, short window, supported or unknown estimate keeps the Orukeet text", async (t) => {
-  const AudioManager = await loadManagerClass(t);
-  for (const [final, expected] of [
-    [
-      { ...JA_FINAL, languageConfidence: 0.89 },
-      { ...JA_DETECTION, sttDetectedLanguageConfidence: 0.89 },
-    ],
-    [
-      { ...JA_FINAL, languageAudioSeconds: 2 },
-      { ...JA_DETECTION, sttDetectedLanguageAudioSeconds: 2 },
-    ],
-    [
-      { ...JA_FINAL, language: "de" },
-      { ...JA_DETECTION, sttDetectedLanguage: "de" },
-    ],
-    [
-      { ...JA_FINAL, language: null, languageConfidence: null },
-      { sttDetectedLanguageStatus: "unknown" },
-    ],
-  ]) {
-    const { uploads, usage, published } = await stopManagedDictation(AudioManager, {
-      final,
-      upload: async () => assert.fail("must not re-transcribe"),
-    });
-    assert.equal(uploads.length, 0);
-    assert.equal(published[0].text, "ashita no kaigi");
-    assert.equal(usage.length, 1);
-    assert.deepEqual(detectionFields(usage[0]), expected);
-  }
-});
-
-test("an explicit language setting never re-transcribes", async (t) => {
-  const AudioManager = await loadManagerClass(t);
-  const { uploads, usage, published } = await stopManagedDictation(AudioManager, {
-    final: JA_FINAL,
-    language: "en",
-    upload: async () => assert.fail("must not re-transcribe"),
-  });
-  assert.equal(uploads.length, 0);
-  assert.equal(published[0].text, "ashita no kaigi");
-  assert.deepEqual(detectionFields(usage[0]), JA_DETECTION);
-});
-
-test("an older gateway sends no detection fields", async (t) => {
-  const AudioManager = await loadManagerClass(t);
-  const { uploads, usage, published } = await stopManagedDictation(AudioManager, {
-    final: { success: true, text: "hello there" },
-    upload: async () => assert.fail("must not re-transcribe"),
-  });
-  assert.equal(uploads.length, 0);
-  assert.equal(published[0].text, "hello there");
-  assert.deepEqual(detectionFields(usage[0]), {});
-});
-
 test("a failed re-transcription is reported and kept for retry, never pasting Orukeet's text", async (t) => {
   const AudioManager = await loadManagerClass(t);
   const saved = [];
@@ -1615,77 +1561,6 @@ test("only a signed-in OpenWhispr Cloud recording is re-transcribed", async (t) 
     assert.equal(uploads.length, 0, JSON.stringify(settings));
     assert.equal(published[0].text, "ashita no kaigi");
   }
-});
-
-test("kept Orukeet text carries the estimate into streaming cleanup and translation", async (t) => {
-  const AudioManager = await loadManagerClass(t, {
-    "/stores/settingsStore": `
-      export const getSettings = () => globalThis.__streamingFinalizationSettings;
-      export const getEffectiveCleanupModel = () => null;
-      export const selectResolvedLLMConfig = () => ({ model: null, provider: null });
-      export const isCloudCleanupMode = () => true;
-      export const isCloudDictationAgentMode = () => false;
-      export const isCloudTranslationMode = () => true;
-    `,
-    "/config/prompts": `
-      export const resolvePrompt = () => "translation prompt";
-      export const appendScreenContextSuffix = (prompt) => prompt;
-    `,
-    "/dictationAgentInference": `
-      export const resolveDictationAgentInference = () => ({ reachable: false, config: {} });
-      export const resolveDictationAgentVisionInference = () => ({ active: false, config: {} });
-    `,
-    "/dictationTranslationInference": `
-      export const resolveDictationTranslationInference = () => ({
-        reachable: true, model: "translation-model", config: { provider: "openwhispr" }
-      });
-    `,
-  });
-  for (const translationRequested of [false, true]) {
-    const { uploads, reasonCalls, usage, published } = await stopManagedDictation(AudioManager, {
-      final: { ...JA_FINAL, languageConfidence: 0.89 },
-      upload: async () => assert.fail("must not re-transcribe"),
-      settings: {
-        useCleanupModel: true,
-        cleanupCloudMode: "openwhispr",
-        customPrompts: {},
-        translationSourceLanguage: "en",
-        translationTargetLanguage: "es",
-      },
-      overrides: {
-        translationRequested,
-        processWithReasoningModel: async () => "translated transcript",
-        finalizeChineseScript: async (text) => text,
-      },
-    });
-    const label = translationRequested ? "translation" : "cleanup";
-    assert.equal(uploads.length, 0, label);
-    assert.equal(
-      published[0].text,
-      translationRequested ? "translated transcript" : "ashita no kaigi。",
-      label
-    );
-    // The cleanup call writes the combined log the backend's gate reads.
-    assert.equal(reasonCalls.length, 1, label);
-    assert.deepEqual(
-      detectionFields(reasonCalls[0][1]),
-      { ...JA_DETECTION, sttDetectedLanguageConfidence: 0.89 },
-      label
-    );
-    assert.equal(usage[0].sendLogs, false, label);
-  }
-});
-
-test("a non-Orukeet provider is untouched", async (t) => {
-  const AudioManager = await loadManagerClass(t);
-  const { uploads, usage, published } = await stopManagedDictation(AudioManager, {
-    final: JA_FINAL,
-    providerName: "deepgram",
-    upload: async () => assert.fail("must not re-transcribe"),
-  });
-  assert.equal(uploads.length, 0);
-  assert.equal(published[0].text, "ashita no kaigi");
-  assert.deepEqual(detectionFields(usage[0]), {});
 });
 
 test("an empty Orukeet final with a confident unsupported estimate still re-transcribes", async (t) => {

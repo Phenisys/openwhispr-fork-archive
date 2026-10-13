@@ -40,9 +40,8 @@ test("safe assistant edits and atomic Undo", async (t) => {
     },
   });
   const vite = await createRendererServer(t);
-  const { syncService } = await vite.ssrLoadModule("/services/SyncService.ts");
   const pushes = [];
-  t.mock.method(syncService, "debouncedPush", (...args) => pushes.push(args));
+  // Fork: no cloud sync — nothing is ever pushed.
   const { updateNoteTool } = await vite.ssrLoadModule("/services/tools/updateNoteTool.ts");
   const { executeTool } = await vite.ssrLoadModule("/services/tools/ToolRegistry.ts");
   const fresh = () => {

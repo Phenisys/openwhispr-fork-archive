@@ -81,20 +81,6 @@ async function applyTranscriptionPolicy(step, transcription) {
   );
 }
 
-test("a first run opens blank", async (t) => {
-  await t.test("hosted", async (t) => {
-    const step = await mountByokStep(t, {});
-    assert.deepEqual(step.selectValues(), [undefined, undefined]);
-    assert.equal(step.value(PLACEHOLDER.hostedKey), "");
-  });
-
-  await t.test("self-hosted", async (t) => {
-    const step = await mountByokStep(t, { selfHostedRequested: true });
-    assert.equal(step.value(PLACEHOLDER.endpoint), "");
-    assert.equal(step.value(PLACEHOLDER.modelId), "");
-  });
-});
-
 test("a saved hosted provider reopens with its model and key, and the draft stays key-free", async (t) => {
   const step = await mountByokStep(t, {
     settings: HOSTED_GROQ,

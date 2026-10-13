@@ -67,7 +67,6 @@ test("cleanup validates completed provider output using the request's prompt set
     "Cloud, Anthropic, enterprise, Gemini and Custom providers share validation",
     async () => {
       setCustomPrompt("");
-      window.electronAPI.cloudReason = async () => ({ success: true, text: DUPLICATE });
       window.electronAPI.processAnthropicReasoning = async () => ({
         success: true,
         text: DUPLICATE,
@@ -90,7 +89,6 @@ test("cleanup validates completed provider output using the request's prompt set
           { headers: { "Content-Type": "application/json" } }
         );
       for (const config of [
-        { provider: "openwhispr" },
         { provider: "anthropic" },
         { provider: "bedrock" },
         { provider: "gemini" },

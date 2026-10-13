@@ -46,8 +46,7 @@ test("note edits preserve separate stored fields, reopen correctly, and report f
     },
   });
   const vite = await createRendererServer(t);
-  const { syncService } = await vite.ssrLoadModule("/services/SyncService.ts");
-  t.mock.method(syncService, "debouncedPush", (...args) => pushes.push(args));
+  // Fork: no cloud sync — nothing is ever pushed.
   const { updateNoteTool } = await vite.ssrLoadModule("/services/tools/updateNoteTool.ts");
   const { getNoteTool } = await vite.ssrLoadModule("/services/tools/getNoteTool.ts");
   const { MAX_CONTENT_LENGTH } = await vite.ssrLoadModule("/services/tools/searchNotesTool.ts");

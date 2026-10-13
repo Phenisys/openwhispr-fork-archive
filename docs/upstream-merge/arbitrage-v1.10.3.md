@@ -48,6 +48,7 @@ Tests retirés après balayage (échouent hors-ligne, couche exclue) : `shareNot
 (+ `useSignInCloudNudge.tsx`), `apiKeysSection`. Adaptés : `audioManager{CleanupOutput,InterruptedRecording}` (plus d'usage/sync cloud),
 `integrationsView` / `connectorsSection` (plus de plan, de volets API/MCP), `meetingNotificationFolderRefresh`, `assistantNoteUndoListener`.
 Correction trouvée par le balayage : `audioManager` référençait `managedResolution` (retiré) — classification des échecs de fournisseurs proxifiés rétablie.
+CI (quality) : tests retirés/adaptés faute de couche cloud — `noteEditorSummaryDeletion` (3, utilisateur connecté / note partagée), `audioManagerStreamingFinalization` (5, usage cloud avec champs de détection de langue), `useChatStreamingTools` (7, plan / connexion / politique d'org), `byokSavedConfig` (« première exécution vide » : nos réglages par défaut sont déjà BYOK), `cleanupOutputValidation` (fournisseur `openwhispr`) ; `noteEditPersistence` / `assistantNoteUndo` sans `SyncService` ; `selfHostedUpload` : nom des setters amont (`setUploadRemote…`, test amont périmé).
 Balayage : ~50 tests `test/helpers` échouent faute d'Electron/better-sqlite3 installés (`--ignore-scripts`), à l'identique de l'amont v1.10.3 (vérifié sur un worktree amont) ; la CI tranche.
 
 Script : `upstream_merge_resolve.py` ignore désormais les spécificateurs en commentaire de ligne.
