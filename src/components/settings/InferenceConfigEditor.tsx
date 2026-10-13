@@ -69,6 +69,8 @@ export default function InferenceConfigEditor({
   );
   const localInferenceTimeoutMs = useSettingsStore((s) => s.localInferenceTimeoutMs);
   const setLocalInferenceTimeoutMs = useSettingsStore((s) => s.setLocalInferenceTimeoutMs);
+  const keepLocalModelLoaded = useSettingsStore((s) => s.keepLocalModelLoaded);
+  const setKeepLocalModelLoaded = useSettingsStore((s) => s.setKeepLocalModelLoaded);
 
   const prefix = MODE_LABEL_PREFIX[scope];
   const { modes, effectiveMode, isModeAllowed } = usePolicyModeOptions<InferenceModeOption>(
@@ -129,11 +131,6 @@ export default function InferenceConfigEditor({
         patch.model = "";
       }
       setResolvedLLMConfig(scope, patch);
-
-      if (mode === "self-hosted" || mode === "enterprise") {
-        window.electronAPI?.llamaServerStop?.();
-      }
-
       onModeChange?.(mode);
     },
     [scope, config.provider, effectiveMode, onModeChange, isModeAllowed]
@@ -205,6 +202,18 @@ export default function InferenceConfigEditor({
             <p className="text-xs text-muted-foreground">{t("reasoning.disableThinking.help")}</p>
           </div>
           <Toggle checked={config.disableThinking} onChange={setField("disableThinking")} />
+        </div>
+      )}
+
+      {effectiveMode === "local" && (
+        <div className="flex items-start justify-between gap-3 pt-1">
+          <div className="flex-1 min-w-0">
+            <h4 className="text-sm font-medium text-foreground">
+              {t("reasoning.keepModelLoaded.label")}
+            </h4>
+            <p className="text-xs text-muted-foreground">{t("reasoning.keepModelLoaded.help")}</p>
+          </div>
+          <Toggle checked={keepLocalModelLoaded} onChange={setKeepLocalModelLoaded} />
         </div>
       )}
 

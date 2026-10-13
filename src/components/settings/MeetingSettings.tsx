@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Cloud, Key, Cpu, Network } from "../icons";
+import { Key, Cpu, Network } from "../icons";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { usePolicyModeOptions, usePolicySnapshot } from "../../hooks/usePolicy";
 import { isModeAllowedByPolicy } from "../../stores/policyRules";
@@ -26,6 +26,21 @@ export function MeetingSpeakerDetectionRow() {
       description={t("settings.meeting.speakerDetection.description")}
     >
       <Toggle checked={speakerDiarizationEnabled} onChange={setSpeakerDiarizationEnabled} />
+    </SettingsRow>
+  );
+}
+
+function MeetingEchoCancellationRow() {
+  const { t } = useTranslation();
+  const meetingAecEnabled = useSettingsStore((s) => s.meetingAecEnabled);
+  const setMeetingAecEnabled = useSettingsStore((s) => s.setMeetingAecEnabled);
+
+  return (
+    <SettingsRow
+      label={t("settingsPage.transcription.aec.toggle.title")}
+      description={t("settingsPage.transcription.aec.toggle.description")}
+    >
+      <Toggle checked={meetingAecEnabled} onChange={setMeetingAecEnabled} />
     </SettingsRow>
   );
 }
@@ -89,6 +104,7 @@ export function MeetingTranscriptionPanel() {
   );
   const handleTranscriptionModeSelect = (mode: InferenceMode) => {
     if (!isModeAllowed(mode)) return;
+    if (mode === "self-hosted") return;
     if (mode === effectiveTranscriptionMode) return;
 
     setMeetingTranscriptionMode(mode);
@@ -165,6 +181,7 @@ export function MeetingTranscriptionPanel() {
       {effectiveTranscriptionMode === "providers" && renderTranscriptionPicker("cloud")}
       {effectiveTranscriptionMode === "local" && renderTranscriptionPicker("local")}
       <MeetingSpeakerDetectionRow />
+      <MeetingEchoCancellationRow />
     </div>
   );
 }

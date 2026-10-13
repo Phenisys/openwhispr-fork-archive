@@ -15,8 +15,8 @@ test("upload settings expose the self-hosted mode with URL + model fields", () =
     /service="transcription"/,
     "panel bound to the transcription self-hosted service"
   );
-  assert.match(settings, /setRemoteTranscriptionUrl/, "URL field wired");
-  assert.match(settings, /setRemoteTranscriptionModel/, "model field wired");
+  assert.match(settings, /setUploadRemoteTranscriptionUrl/, "URL field wired");
+  assert.match(settings, /setUploadRemoteTranscriptionModel/, "model field wired");
   assert.match(
     settings,
     /setUploadTranscriptionMode\(mode\)/,

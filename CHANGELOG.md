@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Version affichée : base amont.** Réglages → Mises à jour → _Version actuelle_ indique la release officielle sur laquelle repose le build (`1.10.5 · upstream 1.10.3`), lue dans le champ `upstreamBase` de `package.json` (à mettre à jour à chaque fusion amont).
 
+## [1.10.5] - 2026-10-13
+
+Version du fork Phenisys : fusion de l'amont officiel **v1.10.3** (`upstreamBase` = 1.10.3). Notes amont : <https://github.com/OpenWhispr/openwhispr/releases/tag/v1.10.3>.
+
+### Fusion amont v1.10.3 (hors couche exclue)
+
+- Assistant et connecteurs : e-mail (Gmail), Slack, Linear, GitHub — toujours derrière une carte d'approbation ; connecteurs actifs sans compte (mode local, `src/helpers/ipcHandlers.js`).
+- Notes : modèles pour le résumé IA, actions dans un chat ancré, vrais tableaux ; erreurs de fournisseur explicites ; baisse de la mémoire au repos ; correctifs Linux / Windows / macOS.
+- Écarté (couche exclue) : compte, cloud, workspace/équipes, partage, billing, sync, Microsoft Calendar, enterprise, volets API/MCP hébergés. Voir `docs/upstream-merge/arbitrage-v1.10.3.md`.
+
 ## [1.10.4] - 2026-10-12
 
 ### Corrections
@@ -96,6 +106,7 @@ A follow-up to 1.10.0 built from everything that landed since. Notes open straig
 
 ### Transcription
 
+- **Local transcription now uses sherpa-onnx 1.13.8.** Cohere Transcribe now returns an empty result for silent audio instead of hallucinating a sentence; the bundled ONNX Runtime also moves to 1.28.2. (#1951, thanks @emanuelet)
 - **Long local dictations transcribe faster.** Parakeet and Orukeet decode audio in 15-second segments, and the app sent them to the local server one after another even though the server decodes on three threads. Segments now decode side by side, one per server thread and sized to the machine's cores, so a one-minute dictation no longer waits on four serial passes. Dictations under 15 seconds are unchanged. (#2178)
 - **Local dictation skips a decode step after you stop.** The app records in compressed WebM/Opus and used to hand that to FFmpeg to unpack before Parakeet, Orukeet, Cohere Transcribe or whisper.cpp could start, about half a second on Windows and a few milliseconds on macOS. The microphone now also keeps a raw 16 kHz copy from the moment it opens, pre-roll included, and the local engine decodes that directly. The WebM is still saved to history and remains what cloud providers, very long recordings and any fallback receive. Transcripts are unchanged: on the real engine, raw and Opus-decoded audio differed in about one word in a hundred, in the raw copy's favour. whisper.cpp also no longer needs FFmpeg present for a ready WAV. (#2179)
 - **Your own Deepgram key works again.** Every Deepgram connection failed with `Unexpected server response: 401`, even though the same key tested fine in Settings and worked against Deepgram directly. Deepgram accepts a raw API key only under its `Token` authorization scheme and reserves `Bearer` for the short-lived tokens OpenWhispr Cloud mints on your behalf — and the app was presenting your key as a `Bearer`. This broke bring-your-own-key dictation as well as Note Recording. (#2140, thanks @nikhilmaddirala)

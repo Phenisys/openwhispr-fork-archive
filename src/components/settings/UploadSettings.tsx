@@ -36,10 +36,10 @@ export function UploadTranscriptionPanel() {
     uploadCloudTranscriptionBaseUrl,
     setUploadCloudTranscriptionBaseUrl,
     setUploadCloudTranscriptionMode,
-    remoteTranscriptionUrl,
-    setRemoteTranscriptionUrl,
-    remoteTranscriptionModel,
-    setRemoteTranscriptionModel,
+    uploadRemoteTranscriptionUrl,
+    setUploadRemoteTranscriptionUrl,
+    uploadRemoteTranscriptionModel,
+    setUploadRemoteTranscriptionModel,
   } = useSettingsStore();
   const {
     modes: transcriptionModes,
@@ -139,10 +139,10 @@ export function UploadTranscriptionPanel() {
       {effectiveTranscriptionMode === "self-hosted" && (
         <SelfHostedPanel
           service="transcription"
-          url={remoteTranscriptionUrl}
-          onUrlChange={setRemoteTranscriptionUrl}
-          model={remoteTranscriptionModel}
-          onModelChange={setRemoteTranscriptionModel}
+          url={uploadRemoteTranscriptionUrl}
+          onUrlChange={setUploadRemoteTranscriptionUrl}
+          model={uploadRemoteTranscriptionModel}
+          onModelChange={setUploadRemoteTranscriptionModel}
         />
       )}
     </div>

@@ -331,6 +331,17 @@ export async function loadFolders(): Promise<FolderItem[]> {
   return items;
 }
 
+// A mounted panel refreshes its local folder rows when the notification creates one.
+export function subscribeMeetingNotificationFolders(): (() => void) | undefined {
+  return window.electronAPI.onMeetingNotificationFolderCreated?.(async () => {
+    try {
+      await loadFolders();
+    } catch {
+      /* Startup loading and pending SQLite rows recover a lost hint. */
+    }
+  });
+}
+
 const containerLoadGenerations = new Map<string, number>();
 const containerLoadsInFlight = new Map<string, Promise<NoteItem[]>>();
 

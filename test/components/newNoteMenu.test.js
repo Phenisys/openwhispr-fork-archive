@@ -4,13 +4,10 @@ const { createElement } = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
 const { createRendererServer, installBrowserGlobals } = require("../lib/rendererTestHarness");
 
-// Ported from upstream v1.10.2 (2026-10-08) to guard the fork's NewNoteMenu.
-// The fork variant has no team-space branch (useCanCreateTeamSpace /
-// CreateSpaceDialog are purged with the account layer), so that upstream
-// assertion is dropped; the note + assistant-chat items and the assistant-off
-// hiding are the guards that remain. The harness renders i18n keys verbatim
-// (no i18next instance is initialized), so assertions match the raw key.
-async function renderMenu(t, { withAssistant = true }) {
+// The harness renders i18n keys verbatim (no i18next instance is initialized), so
+// assertions match on the raw translation key rather than resolved copy. The dropdown
+// primitives are stubbed so the menu's items render inline instead of into a portal.
+async function renderMenu(t, { canCreateTeamSpace, withAssistant = true }) {
   installBrowserGlobals(t);
   const vite = await createRendererServer(t, {
     cachePrefix: "openwhispr-new-note-menu-test-",
@@ -24,7 +21,17 @@ async function renderMenu(t, { withAssistant = true }) {
         export const DropdownMenuItem = passthrough;
         export const DropdownMenuSeparator = () => createElement("div", null);
       `,
+      "/hooks/useCanCreateTeamSpace": `
+        export const useCanCreateTeamSpace = () => globalThis.__canCreateTeamSpace === true;
+      `,
+      "/CreateSpaceDialog": `
+        export default function CreateSpaceDialog() { return null; }
+      `,
     },
+  });
+  globalThis.__canCreateTeamSpace = canCreateTeamSpace;
+  t.after(() => {
+    delete globalThis.__canCreateTeamSpace;
   });
   const mod = await vite.ssrLoadModule("/components/notes/NewNoteMenu.tsx");
   return renderToStaticMarkup(
@@ -35,23 +42,27 @@ async function renderMenu(t, { withAssistant = true }) {
   );
 }
 
-test("the New note menu offers a note and an assistant chat", async (t) => {
-  const markup = await renderMenu(t, {});
+test("the New note menu always offers a note and an assistant chat", async (t) => {
+  const markup = await renderMenu(t, { canCreateTeamSpace: false });
+
   assert.match(markup, /notes\.list\.newNote/);
   assert.match(markup, /notes\.createMenu\.note/);
   assert.match(markup, /notes\.createMenu\.assistantChat/);
 });
 
-// The fork has no team-space option (cloud layer purged).
-test("the New note menu offers no team space", async (t) => {
-  const markup = await renderMenu(t, {});
-  assert.doesNotMatch(markup, /notes\.createMenu\.teamSpace/);
+test("the New note menu never offers a team space, even with create permission", async (t) => {
+  const withoutPermission = await renderMenu(t, { canCreateTeamSpace: false });
+  assert.doesNotMatch(withoutPermission, /notes\.createMenu\.teamSpace/);
+
+  const withPermission = await renderMenu(t, { canCreateTeamSpace: true });
+  assert.doesNotMatch(withPermission, /notes\.createMenu\.teamSpace/);
 });
 
-// The Chat tab disappears when an org turns the assistant off, so the item that
-// navigates there goes with it.
+// The Chat tab disappears entirely when an org turns the assistant off, so the
+// item that navigates there goes with it.
 test("the New note menu hides the assistant chat when the assistant is off", async (t) => {
-  const markup = await renderMenu(t, { withAssistant: false });
+  const markup = await renderMenu(t, { canCreateTeamSpace: false, withAssistant: false });
+
   assert.doesNotMatch(markup, /notes\.createMenu\.assistantChat/);
   assert.match(markup, /notes\.createMenu\.note/);
 });
