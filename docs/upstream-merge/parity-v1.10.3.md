@@ -47,7 +47,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 
 ## 2. Fichiers communs où l'amont a des lignes que nous n'avons pas
 
-Fichiers communs divergents : **133**, dont **116** contiennent des lignes amont absentes chez nous.
+Fichiers communs divergents : **140**, dont **123** contiennent des lignes amont absentes chez nous.
 La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche exclue : ce sont les candidates à la perte silencieuse de fonctionnalité.
 
 | Lignes amont absentes (non-cloud) | Lignes amont absentes (total) | Fichier |
@@ -64,6 +64,7 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 | 100 | 211 | `src/components/notes/UploadAudioView.tsx` |
 | 100 | 110 | `src/services/ai/inferenceProviders/openai.ts` |
 | 94 | 116 | `src/services/ReasoningService.ts` |
+| 93 | 125 | `test/helpers/audioManagerStreamingFinalization.test.js` |
 | 90 | 159 | `src/helpers/audioManager.js` |
 | 85 | 136 | `test/components/integrationsView.test.js` |
 | 82 | 143 | `test/helpers/transcriptionRoute.test.js` |
@@ -71,9 +72,11 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 | 74 | 116 | `src/components/settings/InferenceConfigEditor.tsx` |
 | 74 | 81 | `src/components/IntegrationsView.tsx` |
 | 72 | 100 | `test/helpers/audioManagerWakeWordLanguage.test.js` |
+| 70 | 88 | `test/components/noteEditorSummaryDeletion.test.js` |
 | 69 | 127 | `src/components/OnboardingFlow.tsx` |
 | 67 | 94 | `src/components/integrations/CalendarsPane.tsx` |
 | 65 | 93 | `test/helpers/connectors/connectorManager.test.js` |
+| 62 | 86 | `test/helpers/useChatStreamingTools.test.js` |
 | 61 | 112 | `src/stores/noteStore.ts` |
 | 57 | 76 | `test/helpers/audioManagerCancelLifecycle.test.js` |
 | 57 | 61 | `src/services/ai/inferenceProviders/gemini.ts` |
@@ -89,9 +92,6 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 | 23 | 52 | `src/services/tools/searchNotesTool.ts` |
 | 21 | 42 | `src/components/SettingsModal.tsx` |
 | 21 | 23 | `test/helpers/harness/browserGlobals.js` |
-| 20 | 46 | `preload.js` |
-| 20 | 43 | `src/services/fileTranscription.ts` |
-| 19 | 20 | `src/services/ai/inferenceProviders/tinfoil.ts` |
 
 <details><summary>Lignes non-cloud à relire (fichiers du domaine notes/réunions/panneau)</summary>
 
