@@ -10,7 +10,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 
 | Total | Exclus par le manifeste | **Non classés (à tranche)** |
 |---|---|---|
-| 225 | 225 | **0** |
+| 233 | 233 | **0** |
 
 <details><summary>Fichiers de notre arbre absents de l'amont (28)</summary>
 
@@ -24,9 +24,9 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 - `docs/upstream-merge/arbitrage-v1.10.2.md`
 - `docs/upstream-merge/arbitrage-v1.10.3.md`
 - `docs/upstream-merge/exclusions.txt`
-- `docs/upstream-merge/fork-diff-v1.10.3.md`
 - `docs/upstream-merge/parity-checks.txt`
 - `docs/upstream-merge/parity-v1.10.2.md`
+- `docs/upstream-merge/parity-v1.10.3.md`
 - `electron-builder.unsigned.json`
 - `resources/update-feed.json`
 - `scripts/fork-diff-report.mjs`
@@ -47,7 +47,7 @@ Règle : **intégrer d'abord toutes les fonctionnalités officielles, puis nos s
 
 ## 2. Fichiers communs où l'amont a des lignes que nous n'avons pas
 
-Fichiers communs divergents : **131**, dont **114** contiennent des lignes amont absentes chez nous.
+Fichiers communs divergents : **133**, dont **116** contiennent des lignes amont absentes chez nous.
 La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche exclue : ce sont les candidates à la perte silencieuse de fonctionnalité.
 
 | Lignes amont absentes (non-cloud) | Lignes amont absentes (total) | Fichier |
@@ -64,7 +64,7 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 | 100 | 211 | `src/components/notes/UploadAudioView.tsx` |
 | 100 | 110 | `src/services/ai/inferenceProviders/openai.ts` |
 | 94 | 116 | `src/services/ReasoningService.ts` |
-| 88 | 155 | `src/helpers/audioManager.js` |
+| 90 | 159 | `src/helpers/audioManager.js` |
 | 85 | 136 | `test/components/integrationsView.test.js` |
 | 82 | 143 | `test/helpers/transcriptionRoute.test.js` |
 | 76 | 127 | `CHANGELOG.md` |
@@ -670,7 +670,7 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 
 ## 3. Clés d'interface utilisées par l'amont et plus nulle part chez nous
 
-783 clés. Les namespaces de la couche exclue (auth, workspaces, insights, referral, apiKeysSection, forgotPassword, emailVerification, WorkspaceSection, billing, onboarding, settingsPage, sidebar) sont attendus ; tout le reste signale un écran ou une action disparus.
+786 clés. Les namespaces de la couche exclue (auth, workspaces, insights, referral, apiKeysSection, forgotPassword, emailVerification, WorkspaceSection, billing, onboarding, settingsPage, sidebar) sont attendus ; tout le reste signale un écran ou une action disparus.
 
 | Namespace | Clés | Attendu (couche exclue) |
 |---|---|---|
@@ -686,9 +686,9 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 | `sidebar` | 13 | oui |
 | `upgradePrompt` | 13 | **non — à vérifier** |
 | `forgotPassword` | 12 | oui |
+| `controlPanel` | 9 | **non — à vérifier** |
 | `emailVerification` | 9 | oui |
 | `common` | 6 | **non — à vérifier** |
-| `controlPanel` | 6 | **non — à vérifier** |
 | `settingsModal` | 5 | **non — à vérifier** |
 | `postMigration` | 4 | **non — à vérifier** |
 | `onboarding` | 2 | oui |
@@ -713,7 +713,7 @@ La colonne « non-cloud » compte les lignes qui ne ressemblent PAS à la couche
 - `backfill` : `backfill`
 - `callbackURL` : `callbackURL`
 - `common` : `common.add`, `common.create`, `common.delete`, `common.dismiss`, `common.done`, `common.saving`
-- `controlPanel` : `controlPanel.billing.bannerDescription`, `controlPanel.billing.pastDueDescription`, `controlPanel.billing.pastDueTitle`, `controlPanel.billing.updatePayment`, `controlPanel.limit.weeklyDescription`, `controlPanel.limit.weeklyTitle`
+- `controlPanel` : `controlPanel.billing.bannerDescription`, `controlPanel.billing.pastDueDescription`, `controlPanel.billing.pastDueTitle`, `controlPanel.billing.updatePayment`, `controlPanel.cloudNudge.action`, `controlPanel.cloudNudge.description`, `controlPanel.cloudNudge.title`, `controlPanel.limit.weeklyDescription`, `controlPanel.limit.weeklyTitle`
 - `cursor` : `cursor`
 - `cursor_id` : `cursor_id`
 - `email` : `email`
