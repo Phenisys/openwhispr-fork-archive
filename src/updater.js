@@ -22,6 +22,18 @@ function resolveUpdateFeed() {
   return { provider: "github", owner: "Phenisys", repo: "openwhispr", private: false };
 }
 
+// Fork: the version shown in Settings → Updates also names the official release
+// this build is based on ("1.10.5 · upstream 1.10.3"). The value comes from the
+// package.json `upstreamBase` field, bumped by each upstream merge.
+function withUpstreamBase(version) {
+  try {
+    const { upstreamBase } = require("../package.json");
+    return upstreamBase ? `${version} · upstream ${upstreamBase}` : version;
+  } catch {
+    return version;
+  }
+}
+
 // electron-updater can only replace an AppImage on Linux; deb, rpm and tar.gz
 // installs are updated by the package manager instead.
 const isUpdaterSupported = process.platform !== "linux" || Boolean(process.env.APPIMAGE);
@@ -290,7 +302,7 @@ class UpdateManager {
   async getAppVersion() {
     try {
       const { app } = require("electron");
-      return { version: app.getVersion() };
+      return { version: withUpstreamBase(app.getVersion()) };
     } catch (error) {
       console.error("❌ Error getting app version:", error);
       throw error;

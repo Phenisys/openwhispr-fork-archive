@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Ajouts
+
+- **Version affichée : base amont.** Réglages → Mises à jour → _Version actuelle_ indique la release officielle sur laquelle repose le build (`1.10.5 · upstream 1.10.3`), lue dans le champ `upstreamBase` de `package.json` (à mettre à jour à chaque fusion amont).
+
 ## [1.10.4] - 2026-10-12
 
 ### Corrections
