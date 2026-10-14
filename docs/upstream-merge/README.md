@@ -123,6 +123,21 @@ plus récent installé (nvm **et** fnm) et le **valide par une sonde tsx** : si 
 n'est sain, il s'arrête avec un message explicite (code 70) plutôt que de rapporter
 de faux échecs. Il ne retombe jamais sur un autre majeur.
 
+## Fusionner la PR : « Create a merge commit », jamais en squash
+
+Le merge upstream est un vrai merge (`--no-ff`) : ses parents incluent le commit
+de l'amont, ce qui en fait l'ancêtre commun du prochain merge. Un **squash**
+garde le contenu mais perd cet ancêtre : le merge suivant repartirait de la
+version d'avant et re-conflicterait sur des fichiers déjà arbitrés (cas de la
+v1.10.3, réparé par un merge `-s ours` : PR #32). Si cela arrive :
+
+```bash
+git merge --no-ff -s ours <tag-amont> -m "chore(upstream): record <tag> as merged"
+```
+
+(aucun fichier modifié ; à fusionner lui aussi en merge commit). Contrôle :
+`git merge-base HEAD <tag-amont>` doit renvoyer le commit du tag.
+
 ## Repère de version : `upstreamBase`
 
 La version du fork reste un semver croissant (1.10.4, 1.10.5…) : `electron-updater`
